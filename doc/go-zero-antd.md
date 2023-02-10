@@ -129,9 +129,9 @@ root@tdev:~# docker info|grep Mirrors -A 1
 
 ## 安装docker-compose
 
-1. 通过github下载 docker-compose-linux-x86_64 
+> 通过github下载 docker-compose-linux-x86_64 
 
-    网上有很多通过命令下载，不过有时候下载不下来，直接下载然后通过vscode直接拖拽进服务器。
+网上有很多通过命令下载，不过有时候下载不下来，直接下载然后通过vscode直接拖拽进服务器。
     ![image](.././timg/4.png)
 
     ```
