@@ -12,4 +12,11 @@
 + 4. vscode远程容器内开发golang
 
 ### 首先启动docker-compose
-    [goivinck](https://github.com/nivin-studio/gonivinck)
+    
+[goivinck](https://github.com/nivin-studio/gonivinck) 这个是基于go-zero的一个开发环境
+
+### vscode需要安装两个插件
+
+Remote - SSH (这个可以通过ssh远程连接服务器)
+
+Remote Development （这个可以等远程连接完服务器再连接容器）
