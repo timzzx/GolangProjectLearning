@@ -9,6 +9,7 @@
 [服务器提交github配置（选看）](#github-ssh配置)<br />
 [编写Dockerfile](#编写dockerfile)<br />
 [配置golang环境](#配置golang环境)<br />
+[安装nodejs](#安装nodejs)
 
 > 目的完成一个包含前后端的项目，从环境安装，配置项目，编写代码，调试项目等
 
@@ -348,3 +349,14 @@ All tools successfully installed. You are ready to Go. :)
 ![image](../timg/7.png)
 
 至此 golang远端配置完成
+
+## 安装nodejs
+
+```
+sudo apt -y install nodejs
+
+root@tdev:/home/code# node -v
+v12.22.9
+```
+
+> 至此基本开发环境中所需要的安装完毕。下一步就是创建项目编写代码

@@ -4,8 +4,15 @@
 
 ## 目录
 [go本地开发环境搭建（了解开发环境搭建）](#go本地开发环境搭建)<br />
-[go-zero单体服务+antd开发后台（完整过程）](doc/go-zero-antd.md)<br />
-+ [Ubuntu环境搭建](doc/go-zero-antd.md#ubuntu环境搭建)<br />
+[go-zero单体服务+antd开发后台（完整过程）](doc/go-zero-antd.md)
++ [Ubuntu环境搭建](doc/go-zero-antd.md#环境搭建)<br />
++ [Vscode 远程连接设置](#vscode-远程连接设置)<br />
++ [安装Docker](doc/go-zero-antd.md#安装docker)<br />
++ [安装docke-compose](doc/go-zero-antd.md#安装docker-compose)<br />
++ [服务器提交github配置（选看）](doc/go-zero-antd.md#github-ssh配置)<br />
++ [编写Dockerfile](doc/go-zero-antd.md#编写dockerfile)<br />
++ [配置golang环境](doc/go-zero-antd.md#配置golang环境)<br />
++ [安装nodejs](doc/go-zero-antd.md#安装nodejs)
 
 ## go本地开发环境搭建
 
