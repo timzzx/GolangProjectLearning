@@ -5,6 +5,8 @@
 [Vscode 远程连接设置](#vscode-远程连接设置)<br />
 [安装Docker](#安装docker)<br />
 [安装docke-compose](#安装docker-compose)<br />
+[服务器提交github配置（选看）](#github-ssh配置)<br />
+[编写Dockerfile](#编写dockerfile)
 
 ## Ubuntu环境搭建
 
@@ -155,4 +157,45 @@ root@tdev:~# docker info|grep Mirrors -A 1
     ....
     ```
 
+
+## github ssh配置
+
+ 为了服务器上传代码等资料到github上，开发的话可以参照这个发送代码上传gitlab公司库等   
+```
+// 创建一个新的秘钥，在/root/.ssh
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+
+// 生成后
+-rw------- 1 root root 3381 Feb 10 10:48 id_rsa
+-rw-r--r-- 1 root root  744 Feb 10 10:48 id_rsa.pub
+```
+ 去github新建ssh key，把id_rsa.pub中的内容复制到
+ ![image](../timg/5.png)
+
+ ```
+    Omit --global to set the identity only in this repository.
+
+    fatal: no email was given and auto-detection is disabled
+    2023-02-10 11:01:47.060 [info] > git config --get-all user.name [2ms]
+    2023-02-10 11:01:47.070 [info] > git config --get commit.template [6ms]
+    2023-02-10 11:01:47.072 [info] > git for-each-ref --format=%(refname)%00%(upstream:short)%00%(objectname)%00%(upstream:track)%00%(upstream:remotename)%00%(upstream:remoteref) refs/heads/main refs/remotes/main [3ms]
+    2023-02-10 11:01:47.083 [info] > git status -z -uall [8ms]
+    2023-02-10 11:01:47.090 [info] > git for-each-ref --sort -committerdate --format %(refname) %(objectname) %(*objectname) [7ms]
+ ```
+git 提交报错，主要是添加username和email
+```
+git config --global user.name "xxxxx"
+git config --global user.email "xxxx@126.com"
+```
+这样就可以使用vscode提交代码到github（现在这个是全局，多个git仓库我暂时没有配置过，这个项目暂时先这么处理，如果需要多个ssh key设置自行研究吧）
+
 ## 编写Dockerfile
+
+我单独创建了一个项目把dockerfile放在里面了 [地址](https://github.com/timzzx/GoDockerDev)
+
+### Mysql
+```
+FROM mysql:5.7
+
+LABEL maintainer="tim"
+```
