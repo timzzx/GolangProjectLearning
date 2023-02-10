@@ -35,31 +35,31 @@
 
 3. 配置服务器
     
-修改静态ip
+    修改静态ip
 
-```
-vim /etc/netplan/00-installer-config.yaml
+    ```
+    vim /etc/netplan/00-installer-config.yaml
 
-```
+    ```
 
-修改为
-```
-# This is the network config written by 'subiquity'
-network:
-  ethernets:
-    enp0s3:
-      dhcp4: false
-      addresses: [192.168.1.13/24]
-      optional: true
-      routes:
-        - to: default
-          via: 192.168.1.1
-      nameservers:
-        addresses: [192.168.1.1]
-  version: 2
-```
-应用配置
-```
-netplan apply
-```
+    修改为
+    ```
+    # This is the network config written by 'subiquity'
+    network:
+    ethernets:
+        enp0s3:
+        dhcp4: false
+        addresses: [192.168.1.13/24]
+        optional: true
+        routes:
+            - to: default
+            via: 192.168.1.1
+        nameservers:
+            addresses: [192.168.1.1]
+    version: 2
+    ```
+    应用配置
+    ```
+    netplan apply
+    ```
 Ubuntu基础环境安装配置完成
