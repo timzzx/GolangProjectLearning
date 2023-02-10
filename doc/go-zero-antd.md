@@ -11,7 +11,8 @@
 [配置golang环境](#配置golang环境)<br />
 [安装nodejs](#安装nodejs)<br />
 [go-zero环境配置](#go-zero环境配置)<br />
-[tapi接口开发](#tapi-接口开发)<br />
+[接口demo](#tapi-接口开发)<br />
+[antdpro demo](#antd-pro-demo)<br />
 
 > 目的完成一个包含前后端的项目，从环境安装，配置项目，编写代码，调试项目等
 
@@ -357,10 +358,22 @@ All tools successfully installed. You are ready to Go. :)
 ## 安装nodejs
 
 ```
-sudo apt -y install nodejs
+wget https://nodejs.org/dist/v18.14.0/node-v18.14.0-linux-x64.tar.xz
 
-root@tdev:/home/code# node -v
-v12.22.9
+tar xf node-v18.14.0-linux-x64.tar.xz
+
+mkdir /usr/local/lib/node
+
+mv node-v18.14.0-linux-x64 /usr/local/lib/node/nodejs
+
+sudo vim /etc/profile
+
+// 添加
+export NODEJS_HOME=/usr/local/lib/node/nodejs
+export PATH=$NODEJS_HOME/bin:$PATH
+
+// 刷新
+source /etc/profile
 ```
 
 > 至此基本开发环境中所需要的安装完毕。下一步就是创建项目编写代码
@@ -445,3 +458,13 @@ go run user.go -f etc/user.yaml
 什么也没传递报错field name is not set
 ![image](../timg/9.png)
 参数传递过去后，一切正常了
+
+## antd pro demo
+使用Umi Max来安装antd pro
+```
+npx create-umi@latest
+
+// 启动
+yarn dev
+```
+![image](../timg/10.png)

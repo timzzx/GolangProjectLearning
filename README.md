@@ -14,7 +14,8 @@
 + [配置golang环境](doc/go-zero-antd.md#配置golang环境)<br />
 + [安装nodejs](doc/go-zero-antd.md#安装nodejs)
 + [go-zero环境配置](doc/go-zero-antd.md#go-zero环境配置)<br />
-+ [tapi接口开发](doc/go-zero-antd.md#tapi-接口开发)<br />
++ [接口demo开发](doc/go-zero-antd.md#tapi-接口开发)<br />
++ [antdpro demo](doc/go-zero-antd.md#antd-pro-demo)
 
 ## go本地开发环境搭建
 
