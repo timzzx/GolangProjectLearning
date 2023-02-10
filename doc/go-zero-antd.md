@@ -375,3 +375,72 @@ GOPROXY=https://goproxy.cn/,direct go install github.com/zeromicro/go-zero/tools
 ```
 goctl env check -i -f --verbose 
 ```
+3. vscode 远端安装goctl扩展，这样有代码提示和快捷键
+
+## tapi 接口开发
+> 这部分需要先学习go-zero,不然很多操作无法理解
+
+```
+mkdir /home/code/tapi
+```
+使用vscode远程打开tapi目录进行项目开发了
+
+```
+// 项目初始化
+go mod init tapi
+```
+在项目根目录创建一个project.api
+
+```
+// 生成项目代码
+goctl api go -api project.api -dir ./
+
+// 项目处理依赖
+go mod tidy
+```
+项目目录
+```
+root@tdev:/home/code/tapi# tree
+.
+├── etc
+│   └── user.yaml
+├── go.mod
+├── internal
+│   ├── config
+│   │   └── config.go
+│   ├── handler
+│   │   ├── loginhandler.go
+│   │   └── routes.go
+│   ├── logic
+│   │   └── loginlogic.go
+│   ├── svc
+│   │   └── servicecontext.go
+│   └── types
+│       └── types.go
+├── project.api
+└── user.go
+```
+下面我们只需要修改一下internal/logic/loginlogic.go
+
+```go
+func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, err error) {
+	// todo: add your logic here and delete this line
+
+	return &types.LoginResponse{
+		Code: 200,
+		Msg:  "成功",
+	}, nil
+}
+```
+运行项目
+```
+go run user.go -f etc/user.yaml
+```
+> 第一次执行有点慢
+
+使用postman来访问一下看看
+![image](../timg/8.png)
+
+什么也没传递报错field name is not set
+![image](../timg/9.png)
+参数传递过去后，一切正常了
