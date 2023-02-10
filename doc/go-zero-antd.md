@@ -1,7 +1,7 @@
 # 后台开发实战
 
 ## 目录
-============ 环境配置===============<br />
+
 [Ubuntu环境搭建](#环境搭建)<br />
 [Vscode 远程连接设置](#vscode-远程连接设置)<br />
 [安装Docker](#安装docker)<br />
@@ -9,7 +9,8 @@
 [服务器提交github配置（选看）](#github-ssh配置)<br />
 [编写Dockerfile](#编写dockerfile)<br />
 [配置golang环境](#配置golang环境)<br />
-[安装nodejs](#安装nodejs)
+[安装nodejs](#安装nodejs)<br />
+[go-zero环境配置](#go-zero环境配置)
 
 > 目的完成一个包含前后端的项目，从环境安装，配置项目，编写代码，调试项目等
 
@@ -315,6 +316,8 @@ rm -rf /usr/local/go && tar -C /usr/local -xzf go1.19.1.linux-amd64.tar.gz
 // 在/etc/profile最后添加
 export PATH=$PATH:/usr/local/go/bin
 export GOPROXY=https://goproxy.cn
+export GOPATH="/root/go"
+export PATH=$PATH:$GOPATH/bin
 
 // 然后profile生效
 source /etc/profile
@@ -360,3 +363,15 @@ v12.22.9
 ```
 
 > 至此基本开发环境中所需要的安装完毕。下一步就是创建项目编写代码
+
+## go-zero环境配置
+
+1. 安装goctl
+``` 
+GOPROXY=https://goproxy.cn/,direct go install github.com/zeromicro/go-zero/tools/goctl@latest
+```
+2. protoc & protoc-gen-go安装(单体应用可以不装)
+
+```
+goctl env check -i -f --verbose 
+```
