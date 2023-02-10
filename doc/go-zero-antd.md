@@ -128,3 +128,29 @@ root@tdev:~# docker info|grep Mirrors -A 1
 ```
 
 ## 安装docker-compose
+
+1. 通过github下载 docker-compose-linux-x86_64 
+
+    网上有很多通过命令下载，不过有时候下载不下来，直接下载然后通过vscode直接拖拽进服务器。
+    ![image](.././timg/4.png)
+
+    ```
+    mv docker-compose-linux-x86_64 /usr/local/bin/docker-compose
+
+    sudo chmod +x /usr/local/bin/docker-compose
+
+    // 检查是否安装完成
+
+    root@tdev:/home/code# docker-compose 
+
+    Usage:  docker compose [OPTIONS] COMMAND
+
+    Docker Compose
+
+    Options:
+        --ansi string                Control when to print ANSI control
+                                    characters ("never"|"always"|"auto")
+                                    (default "auto")
+
+    ....
+    ```
