@@ -4,7 +4,7 @@
 
 ## 目录
 [go本地开发环境搭建](#go本地开发环境搭建)<br />
-[go-zero单体服务+antd开发后台](doc/go-zero-antd.md)
+[go-zero单体服务+antd开发后台（完整过程）](doc/go-zero-antd.md)
 
 ## go本地开发环境搭建
 
