@@ -193,9 +193,97 @@ git config --global user.email "xxxx@126.com"
 
 我单独创建了一个项目把dockerfile放在里面了 [地址](https://github.com/timzzx/GoDockerDev)
 
-### Mysql
+### Mysql Dockerfile
 ```
 FROM mysql:5.7
 
 LABEL maintainer="tim"
 ```
+
+### Redis Dockerfile
+```
+FROM redis:5.0
+
+LABEL maintainer="tim"
+```
+
+### docker-compose.yml
+```
+version: '1.0'
+# 网络配置
+networks:
+  backend:
+    driver: ${NETWORKS_DRIVER}
+
+# 服务容器配置
+services:
+  mysql:
+    build:
+      context: ./mysql
+    environment:
+      - TZ=${TZ}
+      - MYSQL_USER=${MYSQL_USERNAME}                  # 设置 Mysql 用户名称
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}              # 设置 Mysql 用户密码
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}    # 设置 Mysql root 用户密码
+    privileged: true
+    volumes:
+      - ${DATA_PATH_HOST}/mysql:/var/lib/mysql        # 引用 .env 配置中 DATA_PATH_HOST 变量，将宿主机上存放 Mysql 数据的目录挂载到容器中 /var/lib/mysql 目录
+    ports:
+      - "${MYSQL_PORT}:3306"                          # 设置容器3306端口映射指定宿主机端口
+    networks:
+      - backend
+    restart: always
+
+  redis:
+    build:
+      context: ./redis
+    environment:
+      - TZ=${TZ}
+    privileged: true
+    volumes:
+      - ${DATA_PATH_HOST}/redis:/data                 # 引用 .env 配置中 DATA_PATH_HOST 变量，将宿主机上存放 Redis 数据的目录挂载到容器中 /data 目录
+    ports:
+      - "${REDIS_PORT}:6379"                          # 设置容器6379端口映射指定宿主机端口
+    networks:
+      - backend
+    restart: always
+```
+
+### .env
+```
+# 设置时区
+TZ=Asia/Shanghai
+# 设置网络模式
+NETWORKS_DRIVER=bridge
+
+# 宿主机上Mysql Reids数据存放的目录路径
+DATA_PATH_HOST=./data
+
+# Mysql 服务映射宿主机端口号，可在宿主机127.0.0.1:3306访问
+MYSQL_PORT=3306
+MYSQL_USERNAME=admin
+MYSQL_PASSWORD=123456
+MYSQL_ROOT_PASSWORD=123456
+
+# Redis 服务映射宿主机端口号，可在宿主机127.0.0.1:6379访问
+REDIS_PORT=6379
+```
+
+项目目录
+```
+.
+├── LICENSE
+├── README.md
+├── docker-compose.yml
+├── mysql
+│   └── Dockerfile
+└── redis
+    └── Dockerfile
+```
+
+启动
+``` 
+docker-compose up -d
+```
+
+测试mysql redis 连接成功
