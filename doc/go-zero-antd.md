@@ -10,7 +10,8 @@
 [编写Dockerfile](#编写dockerfile)<br />
 [配置golang环境](#配置golang环境)<br />
 [安装nodejs](#安装nodejs)<br />
-[go-zero环境配置](#go-zero环境配置)
+[go-zero环境配置](#go-zero环境配置)<br />
+[tapi接口开发](#tapi-接口开发)<br />
 
 > 目的完成一个包含前后端的项目，从环境安装，配置项目，编写代码，调试项目等
 
