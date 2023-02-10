@@ -314,6 +314,7 @@ rm -rf /usr/local/go && tar -C /usr/local -xzf go1.19.1.linux-amd64.tar.gz
 // 在/etc/profile最后添加
 export PATH=$PATH:/usr/local/go/bin
 export GOPROXY=https://goproxy.cn
+
 // 然后profile生效
 source /etc/profile
 
@@ -322,3 +323,28 @@ root@tdev:/home/tim# go version
 go version go1.19.1 linux/amd64
 
 ```
+
+### vscode 配置远端golang
+
+在远端安装golang扩展
+
+![image](../timg/6.png)
+
+安装完会自动跳出安装go tools 点击安装就可以了
+
+```
+Installing github.com/cweill/gotests/gotests@v1.6.0 (/root/go/bin/gotests) SUCCEEDED
+Installing github.com/fatih/gomodifytags@v1.16.0 (/root/go/bin/gomodifytags) SUCCEEDED
+Installing github.com/josharian/impl@v1.1.0 (/root/go/bin/impl) SUCCEEDED
+Installing github.com/haya14busa/goplay/cmd/goplay@v1.0.0 (/root/go/bin/goplay) SUCCEEDED
+Installing github.com/go-delve/delve/cmd/dlv@latest (/root/go/bin/dlv) SUCCEEDED
+Installing golang.org/x/lint/golint@latest (/root/go/bin/golint) SUCCEEDED
+Installing golang.org/x/tools/gopls@latest (/root/go/bin/gopls) SUCCEEDED
+
+All tools successfully installed. You are ready to Go. :)
+```
+修改一下gofmt不然格式化会有问题
+
+![image](../timg/7.png)
+
+至此 golang远端配置完成
