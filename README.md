@@ -29,6 +29,8 @@
 + [待办列表](doc/go-zero-antd2.md#待办列表)<br />
 + [目的](doc/go-zero-antd2.md#目的)<br />
 + [数据库表设计](doc/go-zero-antd2.md#数据库表设计)<br />
++ [使用gorm gen](doc/go-zero-antd2.md#使用gorm-gen)<br />
++ [使用gorm gen测试](doc/go-zero-antd2.md#go-zero引入gorm-gen测试)<br />
 
 ## go本地开发环境搭建
 

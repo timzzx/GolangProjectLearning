@@ -7,6 +7,7 @@
 [目的](#目的)<br />
 [数据库表设计](#数据库表设计)<br />
 [使用gorm gen](#使用gorm-gen)<br />
+[使用gorm gen测试](#go-zero引入gorm-gen测试)<br />
 
 ## 待办列表
 
@@ -126,6 +127,8 @@ System clock synchronized: yes
 
 ## go-zero引入gorm gen
 
+> 说明一下，go-zero的orm封装的比较简单，虽然带cahce的封装，不过这个功能对于后台来说不需要，反而后台涉及统计sql比较复杂，所以改用gorm。
+
 增加make命令,编辑makefile
 
 ```
@@ -141,5 +144,142 @@ go run user.go -f etc/user.yaml
 Starting server at 0.0.0.0:8888...
 ```
 
+增加Mysql配置，修改etc/user.yaml
+```
+Name: User
+Host: 0.0.0.0
+Port: 8888
+
+Mysql:
+  DataSource: root:123456@tcp(192.168.1.13:3306)/bk?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+```
+
+修改tapi/internal/config/config.go
+```go
+package config
+
+import "github.com/zeromicro/go-zero/rest"
+
+type Config struct {
+	rest.RestConf
+
+	Mysql struct {
+		DataSource string
+	}
+}
+
+```
+修改tapi/internal/svc/servicecontext.go
+```go
+package svc
+
+import (
+	"tapi/bkmodel/dao/query"
+	"tapi/internal/config"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+
+type ServiceContext struct {
+	Config config.Config
+
+	BkModel *query.Query
+}
+
+func NewServiceContext(c config.Config) *ServiceContext {
+	db, _ := gorm.Open(mysql.Open(c.Mysql.DataSource), &gorm.Config{})
+	return &ServiceContext{
+		Config:  c,
+		BkModel: query.Use(db),
+	}
+}
+
+```
+修改tapi/internal/logic/loginlogic.go
+```go
+package logic
+
+import (
+	"context"
+
+	"tapi/internal/svc"
+	"tapi/internal/types"
+
+	"github.com/zeromicro/go-zero/core/logx"
+)
+
+type LoginLogic struct {
+	logx.Logger
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+}
+
+func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic {
+	return &LoginLogic{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
+}
+
+func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, err error) {
+	// todo: add your logic here and delete this line
+	table := l.svcCtx.BkModel.User
+	user, err := table.WithContext(l.ctx).Where(table.Name.Eq(req.Name)).Debug().First()
+
+	if err != nil {
+
+		return &types.LoginResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}, nil
+	}
+
+	return &types.LoginResponse{
+		Code: 200,
+		Msg:  user.Name,
+	}, nil
+}
+
+```
+
+## go-zero引入gorm gen测试
+
+插入一条数据
+```sql
+INSERT INTO `user` VALUES ('1', 'tim', '123456', '1', '0', '0');
+```
+
+运行项目
+```
+make dev
+
+// 返回
+go run user.go -f etc/user.yaml
+Starting server at 0.0.0.0:8888...
+```
+打开postman访问
+![image](../timg2/1.png)
+name 发送tim11 是个错误的，所以返回没有记录。
+![image](../timg2/2.png)
+正确返回
+
+> debug选项要注意一下
+``` go
+// debug在这里，去掉就不会输出sql语句注意一下
+user, err := table.WithContext(l.ctx).Where(table.Name.Eq(req.Name)).Debug().First()
+
+```
 
 
+```
+// console 输出正确的信息
+2023/02/11 17:15:07 /home/code/tapi/bkmodel/dao/query/user.gen.go:234
+[0.784ms] [rows:1] SELECT * FROM `user` WHERE `user`.`name` = 'tim' ORDER BY `user`.`id` LIMIT 1
+
+// console 输出错误的信息
+2023/02/11 17:11:32 /home/code/tapi/bkmodel/dao/query/user.gen.go:234 record not found
+[0.908ms] [rows:0] SELECT * FROM `user` WHERE `user`.`name` = 'tim11' ORDER BY `user`.`id` LIMIT 1
+
+```
