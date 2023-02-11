@@ -94,4 +94,33 @@ gen:
 	gentool -dsn "root:123456@tcp(192.168.1.13:3306)/bk?charset=utf8mb4&parseTime=True&loc=Local" -outPath "./bkmodel/dao/query"
 ```
 
-以后要生成model直接 make gen 即可
+make gen运行展示
+```
+root@tdev:/home/code/tapi# make gen
+gentool -dsn "root:123456@tcp(192.168.1.13:3306)/bk?charset=utf8mb4&parseTime=True&loc=Local" -outPath "./bkmodel/dao/query"
+2023/02/11 07:19:53 got 6 columns from table <user>
+2023/02/11 07:19:53 Start generating code.
+2023/02/11 07:19:53 generate model file(table <user> -> {model.User}): /home/code/tapi/bkmodel/dao/model/user.gen.go
+2023/02/11 07:19:53 generate query file: /home/code/tapi/bkmodel/dao/query/user.gen.go
+2023/02/11 07:19:53 generate query file: /home/code/tapi/bkmodel/dao/query/gen.go
+2023/02/11 07:19:53 Generate code done.
+```
+
+时区有问题改一下
+```
+sudo timedatectl set-timezone Asia/Shanghai
+
+// 检查
+root@tdev:/home/code/tapi# sudo timedatectl set-timezone Asia/Shanghai
+root@tdev:/home/code/tapi# timedatectl
+               Local time: Sat 2023-02-11 15:31:07 CST
+           Universal time: Sat 2023-02-11 07:31:07 UTC
+                 RTC time: Sat 2023-02-11 07:31:07
+                Time zone: Asia/Shanghai (CST, +0800)
+System clock synchronized: yes
+              NTP service: active
+          RTC in local TZ: no
+```
+
+## go-zero引入gorm gen
+
