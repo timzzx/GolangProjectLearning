@@ -9,13 +9,14 @@
 [使用gorm gen](#使用gorm-gen)<br />
 [使用gorm gen测试](#go-zero引入gorm-gen测试)<br />
 [修改项目的api文件等配置](#修改项目的api文件等配置)<br />
+[jwt用户登录](#jwt用户登录)<br />
 
 ## 待办列表
 
 - [x] 目的  
-- [ ] 设计数据库表
+- [x] 设计数据库表
 - [ ] go-zero api
-- [ ] antd pro 配合 go-zero
+- [ ] antd pro
 
 ## 目的
 
@@ -322,7 +323,287 @@ db:
 api:
 	goctl api go -api project.api -dir ./ -style gozero
 dev:
-	go run backend.go -f etc/user.yaml
+	go run backend.go -f etc/backend.yaml
 ```
 
-执行 make api 删除 user.go
+删除 
+
+user.go 
+
+/etc/user.api
+
+internal/handle/下所有的
+
+internal/logic/所有
+
+执行 make api 
+
+重新生成好后
+目前项目目录
+``` 
+root@tdev:/home/code/tapi# tree
+.
+├── backend.go
+├── bkmodel
+│   └── dao
+│       ├── model
+│       │   └── user.gen.go
+│       └── query
+│           ├── gen.go
+│           └── user.gen.go
+├── etc
+│   ├── backend.yaml
+├── go.mod
+├── go.sum
+├── internal
+│   ├── config
+│   │   └── config.go
+│   ├── handler
+│   │   ├── loginhandler.go
+│   │   └── routes.go
+│   ├── logic
+│   │   └── loginlogic.go
+│   ├── svc
+│   │   └── servicecontext.go
+│   └── types
+│       └── types.go
+├── makefile
+└── project.api
+
+11 directories, 16 files
+```
+## jwt用户登录
+
+修改etc/backend.yaml
+``` js
+Name: Backend
+Host: 0.0.0.0
+Port: 8888
+
+Mysql:
+  DataSource: root:123456@tcp(192.168.1.13:3306)/bk?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+
+# 增加jwt参数
+Auth: 
+  AccessSecret: uOvKLmVfztaXGpNYd4Z0I1SiT7MweJhl
+  AccessExpire: 86400
+
+```
+修改config/config.go
+``` go
+package config
+
+import "github.com/zeromicro/go-zero/rest"
+
+type Config struct {
+	rest.RestConf
+    // 增加jwt验证
+	Auth struct {
+		AccessSecret string
+		AccessExpire int64
+	}
+
+	Mysql struct {
+		DataSource string
+	}
+}
+
+```
+修改 backend.api
+```go
+syntax = "v1"
+
+info(
+	title: "tapi"
+	desc: "接口"
+	author: "tim"
+	version: 1.0
+)
+
+type (
+	LoginRequest {
+		Name     string `form:"name"`
+		Password string `form:"password"`
+	}
+	LoginResponse {
+		Code  int64  `json:"code"`
+		Msg   string `json:"msg"`
+		Token string `json:"token,optional"`
+	}
+
+	UserInfo {
+		Id    int64  `json:"id"`
+		Name  string `json:"name"`
+		Ctime int64  `json:"ctime"`
+		Utime int64  `json:"utime"`
+	}
+	UserInfoRequest {
+	}
+	UserInfoResponse {
+		Code int64    `json:"code"`
+		Msg  string   `json:"msg"`
+		Data UserInfo `json:"data,optional"`
+	}
+)
+
+service Backend {
+	@handler Login
+	post /api/login(LoginRequest) returns (LoginResponse)
+}
+
+@server(
+	jwt: Auth // 开启auth验证
+)
+
+service Backend {
+	@handler UserInfo
+	post /api/user/info(UserInfoRequest) returns (UserInfoResponse)
+}
+```
+执行 make api 生成代码
+
+创建目录和文件common/jwtx/jwt.go
+```go
+package jwtx
+
+import "github.com/golang-jwt/jwt/v4"
+
+func GetToken(secretKey string, iat, seconds, uid int64) (string, error) {
+	claims := make(jwt.MapClaims)
+	claims["exp"] = iat + seconds
+	claims["iat"] = iat
+	claims["uid"] = uid
+	token := jwt.New(jwt.SigningMethodHS256)
+	token.Claims = claims
+	return token.SignedString([]byte(secretKey))
+}
+```
+修改internal/logic/loginlogic.go
+```go
+package logic
+
+import (
+	"context"
+	"time"
+
+	"tapi/common/jwtx"
+	"tapi/internal/svc"
+	"tapi/internal/types"
+
+	"github.com/zeromicro/go-zero/core/logx"
+)
+
+type LoginLogic struct {
+	logx.Logger
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+}
+
+func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic {
+	return &LoginLogic{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
+}
+
+func (l *LoginLogic) Login(req *types.LoginRequest) (resp *types.LoginResponse, err error) {
+	// user表
+	table := l.svcCtx.BkModel.User
+	// 查询用户
+	user, err := table.WithContext(l.ctx).Where(table.Name.Eq(req.Name)).Debug().First()
+	if err != nil {
+		return &types.LoginResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}, nil
+	}
+
+	// 判断密码是否正确
+	if user.Password != req.Password {
+		return &types.LoginResponse{
+			Code: 500,
+			Msg:  "密码错误",
+		}, nil
+	}
+
+	// 获取accessToken
+	now := time.Now().Unix()
+	accessExpire := l.svcCtx.Config.Auth.AccessExpire
+
+	accessToken, err := jwtx.GetToken(l.svcCtx.Config.Auth.AccessSecret, now, accessExpire, user.ID)
+	if err != nil {
+		return &types.LoginResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}, nil
+	}
+
+	return &types.LoginResponse{
+		Code:  200,
+		Token: accessToken,
+		Msg:   "成功",
+	}, nil
+}
+
+```
+
+测试访问一下
+![image](../timg2/3.png)
+
+修改internal/logic/userinfologic.go
+```go
+package logic
+
+import (
+	"context"
+	"encoding/json"
+
+	"tapi/internal/svc"
+	"tapi/internal/types"
+
+	"github.com/zeromicro/go-zero/core/logx"
+)
+
+type UserInfoLogic struct {
+	logx.Logger
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+}
+
+func NewUserInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserInfoLogic {
+	return &UserInfoLogic{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
+}
+
+func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (resp *types.UserInfoResponse, err error) {
+	// 获取token中的uid，具体自行查看go-zero的文档和源码，access的验证框架已经实现，我们只需要配置Auth的对应参数
+	uid, _ := l.ctx.Value("uid").(json.Number).Int64()
+	table := l.svcCtx.BkModel.User
+	user, err := table.WithContext(l.ctx).Where(table.ID.Eq(uid)).First()
+
+	if err != nil {
+		return &types.UserInfoResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}, nil
+	}
+
+	return &types.UserInfoResponse{
+		Code: 200,
+		Msg:  "成功",
+		Data: types.UserInfo{
+			Id:    user.ID,
+			Name:  user.Name,
+			Ctime: int64(user.Ctime),
+			Utime: int64(user.Utime),
+		},
+	}, nil
+}
+
+```
+测试
+![image](../timg2/4.png)

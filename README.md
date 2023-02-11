@@ -32,6 +32,7 @@
 + [使用gorm gen](doc/go-zero-antd2.md#使用gorm-gen)<br />
 + [使用gorm gen测试](doc/go-zero-antd2.md#go-zero引入gorm-gen测试)<br />
 + [修改项目的api文件等配置](doc/go-zero-antd2.md#修改项目的api文件等配置)<br />
++ [jwt用户登录](doc/go-zero-antd2.md#jwt用户登录)<br />
 
 ## go本地开发环境搭建
 
