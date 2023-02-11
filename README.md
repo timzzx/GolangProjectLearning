@@ -3,9 +3,12 @@
 > 个人使用go开发学习的记录
 
 ## 目录
-> 开发环境配置
+
 
 [go本地开发环境搭建（了解开发环境搭建）](#go本地开发环境搭建)<br />
+
+> go-zero单体服务+antd开发后台 开发环境配置
+
 [go-zero单体服务+antd开发后台（环境搭建）](doc/go-zero-antd.md)
 + [Ubuntu环境搭建](doc/go-zero-antd.md#环境搭建)<br />
 + [Vscode 远程连接设置](#vscode-远程连接设置)<br />
