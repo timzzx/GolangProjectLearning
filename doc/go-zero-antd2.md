@@ -19,6 +19,8 @@
 
 > 完成基于go-zero单体服务+antd pro后台，登录，用户管理，权限管理
 
+> 尽量展示开发过程遇到的问题，并解决，不会为了排版就把问题提前，什么时候遇到什么时候展示解决。
+
 ## 数据库表设计
 
 1. 基于[GoDockerDev](https://github.com/timzzx/GoDockerDev)启动mysql，redis
@@ -123,4 +125,21 @@ System clock synchronized: yes
 ```
 
 ## go-zero引入gorm gen
+
+增加make命令,编辑makefile
+
+```
+gen_api:
+	goctl api go -api project.api -dir ./
+dev:
+	go run user.go -f etc/user.yaml
+```
+
+运行项目看看
+```
+go run user.go -f etc/user.yaml
+Starting server at 0.0.0.0:8888...
+```
+
+
 
