@@ -41,5 +41,17 @@ root@tdev:/home/code/dev_compose/GoDockerDev# docker-compose up -d
  ⠿ Container godockerdev-mysql-1  Started                                                    1.0s
 ```
 
+创建bk数据库并且创建user表
 
+```sql
+CREATE TABLE `user` (
+  `id` bigint(20) unsigned zerofill NOT NULL AUTO_INCREMENT COMMENT '用户表主键',
+  `name` varchar(128) NOT NULL COMMENT '用户名',
+  `password` varchar(64) NOT NULL COMMENT '密码',
+  `status` int(11) NOT NULL DEFAULT '1' COMMENT '是否有效1.有效 2.无效',
+  `ctime` int(11) NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `utime` int(11) DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表'
+```
 
