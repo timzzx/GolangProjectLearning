@@ -83,3 +83,15 @@ go mod tidy
 
 ```
 
+> 注意 -outPath "./bkmodel/dao/query" 能改变的只能是bkmodel这个目录，后面的是固定的。
+
+> 测试表增加一个字段，增加一张表，重新执行命令后新的表和字段都会生成。bkmodel下所有文件都不要修改直接使用就好
+
+创建makefile
+```
+# 命令
+gen:
+	gentool -dsn "root:123456@tcp(192.168.1.13:3306)/bk?charset=utf8mb4&parseTime=True&loc=Local" -outPath "./bkmodel/dao/query"
+```
+
+以后要生成model直接 make gen 即可
