@@ -17,6 +17,11 @@
 + [接口demo开发](doc/go-zero-antd.md#tapi-接口开发)<br />
 + [antdpro demo](doc/go-zero-antd.md#antd-pro-demo)
 
+================================
+[后台开发实战-2](doc/go-zero-antd2.md#后台开发实战-2)
++ 
+
+
 ## go本地开发环境搭建
 
 > 使用vbox + Ubuntu虚拟机 + docker + docker-compose + vscode远程容器内开发golang
