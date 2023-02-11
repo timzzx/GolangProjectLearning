@@ -16,7 +16,7 @@
 
 > 正式进行后台开发
 
-[后台开发实战2](./go-zero-antd2.md#后台开发实战-2)
+[go-zero单体服务+antd开发后台（基础功能开发）](./go-zero-antd2.md#后台开发实战-2)
 
 > 目的完成一个包含前后端的项目，从环境安装，配置项目，编写代码，调试项目等
 
@@ -203,7 +203,7 @@ git config --global user.email "xxxx@126.com"
 
 ## 编写Dockerfile
 
-我单独创建了一个项目把dockerfile放在里面了 [地址](https://github.com/timzzx/GoDockerDev)
+单独创建了一个项目把dockerfile放在里面了 [地址](https://github.com/timzzx/GoDockerDev)
 
 ### Mysql Dockerfile
 ```
@@ -489,3 +489,7 @@ npx create-umi@latest
 yarn dev
 ```
 ![image](../timg/10.png)
+
+> 正式后台开发
+
+[go-zero单体服务+antd开发后台（基础功能开发）](./go-zero-antd2.md#后台开发实战-2)
