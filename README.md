@@ -26,6 +26,9 @@
 
 [go-zero单体服务+antd开发后台（基础功能开发）](doc/go-zero-antd2.md#后台开发实战-2)
 
++ [待办列表](doc/go-zero-antd2.md#待办列表)<br />
++ [目的](doc/go-zero-antd2.md#目的)<br />
++ [数据库表设计](doc/go-zero-antd2.md#数据库表设计)<br />
 
 ## go本地开发环境搭建
 
