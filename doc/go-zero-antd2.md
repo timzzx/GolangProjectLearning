@@ -55,3 +55,30 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户表'
 ```
 
+## 使用gorm gen
+
+安装生成
+```
+// 安装Gen Tool
+go install gorm.io/gen/tools/gentool@latest
+
+// 报错了
+cgo: C compiler "gcc" not found: exec: "gcc": executable file not found in $PATH
+
+// 安装Ubuntu开发包(省事)
+sudo apt install build-essential
+
+// 再次安装Gen Tool
+go install gorm.io/gen/tools/gentool@latest
+
+cd tapi/
+mkdir bkmodel
+
+// 生成gen
+gentool -dsn "root:123456@tcp(192.168.1.13:3306)/bk?charset=utf8mb4&parseTime=True&loc=Local" -outPath "./bkmodel/dao/query"
+
+// 更新依赖
+go mod tidy
+
+```
+
