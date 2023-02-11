@@ -404,6 +404,23 @@ mkdir /home/code/tapi
 go mod init tapi
 ```
 在项目根目录创建一个project.api
+```
+type (
+	LoginRequest {
+		Name     string `form:"name"`
+		Password string `form:"password"`
+	}
+	LoginResponse {
+		Code int64  `json:"code"`
+		Msg  string `json:"msg"`
+	}
+)
+
+service User {
+	@handler Login
+	post /api/user/login(LoginRequest) returns (LoginResponse)
+}
+```
 
 ```
 // 生成项目代码
