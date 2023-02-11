@@ -31,6 +31,7 @@
 + [数据库表设计](doc/go-zero-antd2.md#数据库表设计)<br />
 + [使用gorm gen](doc/go-zero-antd2.md#使用gorm-gen)<br />
 + [使用gorm gen测试](doc/go-zero-antd2.md#go-zero引入gorm-gen测试)<br />
++ [## 修改项目的api文件等配置](doc/go-zero-antd2.md#修改项目的api文件等配置)<br />
 
 ## go本地开发环境搭建
 

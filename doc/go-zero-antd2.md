@@ -8,6 +8,7 @@
 [数据库表设计](#数据库表设计)<br />
 [使用gorm gen](#使用gorm-gen)<br />
 [使用gorm gen测试](#go-zero引入gorm-gen测试)<br />
+[## 修改项目的api文件等配置](#修改项目的api文件等配置)<br />
 
 ## 待办列表
 
@@ -283,3 +284,45 @@ user, err := table.WithContext(l.ctx).Where(table.Name.Eq(req.Name)).Debug().Fir
 [0.908ms] [rows:0] SELECT * FROM `user` WHERE `user`.`name` = 'tim11' ORDER BY `user`.`id` LIMIT 1
 
 ```
+
+## 修改项目的api文件等配置
+
+> tapi项目的启动go文件为user.go,不是很合理。所以处理一下。
+
+修改project.api
+```go
+type (
+	LoginRequest {
+		Name     string `form:"name"`
+		Password string `form:"password"`
+	}
+	LoginResponse {
+		Code int64  `json:"code"`
+		Msg  string `json:"msg"`
+	}
+)
+
+service Backend {
+	@handler Login
+	post /api/user/login(LoginRequest) returns (LoginResponse)
+}
+```
+
+修改makefile
+
+```makefile
+# 命令
+help:
+	@echo 'Usage:'
+	@echo '     db 生成sql执行代码'
+	@echo '     api 根据api文件生成go-zero api代码'
+	@echo '     dev 运行'
+db:
+	gentool -dsn 'root:123456@tcp(192.168.1.13:3306)/bk?charset=utf8mb4&parseTime=True&loc=Local' -outPath './bkmodel/dao/query'
+api:
+	goctl api go -api project.api -dir ./ -style gozero
+dev:
+	go run backend.go -f etc/user.yaml
+```
+
+执行 make api 删除 user.go
