@@ -8,7 +8,7 @@
 [数据库表设计](#数据库表设计)<br />
 [使用gorm gen](#使用gorm-gen)<br />
 [使用gorm gen测试](#go-zero引入gorm-gen测试)<br />
-[## 修改项目的api文件等配置](#修改项目的api文件等配置)<br />
+[修改项目的api文件等配置](#修改项目的api文件等配置)<br />
 
 ## 待办列表
 
