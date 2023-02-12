@@ -10,6 +10,7 @@
 [使用gorm gen测试](#go-zero引入gorm-gen测试)<br />
 [修改项目的api文件等配置](#修改项目的api文件等配置)<br />
 [jwt用户登录](#jwt用户登录)<br />
+[错误处理](#错误处理)<br />
 
 ## 待办列表
 
@@ -607,3 +608,123 @@ func (l *UserInfoLogic) UserInfo(req *types.UserInfoRequest) (resp *types.UserIn
 ```
 测试
 ![image](../timg2/4.png)
+
+## 错误处理
+
+编辑product.api
+``` go
+syntax = "v1"
+
+info(
+	title: "tapi"
+	desc: "接口"
+	author: "tim"
+	version: 1.0
+)
+
+type (
+
+	// 错误   增加这个结构
+	CodeErrorResponse {
+		Code int64  `json:"code"`
+		Msg  string `json:"msg"`
+	}
+
+	// 登录请求
+	LoginRequest {
+		Name     string `form:"name"`
+		Password string `form:"password"`
+	}
+	// 登录返回
+	LoginResponse {
+		Code  int64  `json:"code"`
+		Msg   string `json:"msg"`
+		Token string `json:"token,optional"`
+	}
+
+	// 用户数据
+	UserInfo {
+		Id    int64  `json:"id"`
+		Name  string `json:"name"`
+		Ctime int64  `json:"ctime"`
+		Utime int64  `json:"utime"`
+	}
+
+	UserInfoRequest {
+	}
+	UserInfoResponse {
+		Code int64    `json:"code"`
+		Msg  string   `json:"msg"`
+		Data UserInfo `json:"data,optional"`
+	}
+)
+
+service Backend {
+	@handler Login
+	post /api/login(LoginRequest) returns (LoginResponse)
+}
+
+@server(
+	jwt: Auth // 开启auth验证
+)
+
+service Backend {
+	@handler UserInfo
+	post /api/user/info(UserInfoRequest) returns (UserInfoResponse)
+}
+```
+
+运行 make api 生成代码
+
+修改 backend.go
+``` go
+package main
+
+import (
+	"context"
+	"flag"
+	"fmt"
+	"net/http"
+
+	"tapi/internal/config"
+	"tapi/internal/handler"
+	"tapi/internal/svc"
+	"tapi/internal/types"
+
+	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/rest"
+	"github.com/zeromicro/go-zero/rest/httpx"
+)
+
+var configFile = flag.String("f", "etc/backend.yaml", "the config file")
+
+func main() {
+	flag.Parse()
+
+	var c config.Config
+	conf.MustLoad(*configFile, &c)
+
+	server := rest.MustNewServer(c.RestConf)
+	defer server.Stop()
+
+	ctx := svc.NewServiceContext(c)
+	handler.RegisterHandlers(server, ctx)
+	// 全局错误处理 增加这段代码
+	httpx.SetErrorHandlerCtx(func(ctx context.Context, err error) (int, interface{}) {
+		fmt.Println(err.Error())
+		return http.StatusOK, &types.CodeErrorResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}
+	})
+
+	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
+	server.Start()
+}
+
+```
+启动服务 make dev
+
+![image](../timg2/5.png)
+
+> go-zero的自定义错误，有点麻烦，后台暂时用不上，这里就用最简单的处理方式。处理方式自行决定。
