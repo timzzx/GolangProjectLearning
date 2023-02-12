@@ -720,3 +720,179 @@ func main() {
 ![image](../timg2/5.png)
 
 > go-zero的自定义错误，有点麻烦，后台暂时用不上，这里就用最简单的处理方式。处理方式自行决定。
+
+## 创建用户
+
+修改 project.api
+
+```go
+syntax = "v1"
+
+info(
+	title: "tapi"
+	desc: "接口"
+	author: "tim"
+	version: 1.0
+)
+
+type (
+
+	// 错误
+	CodeErrorResponse {
+		Code int64  `json:"code"`
+		Msg  string `json:"msg"`
+	}
+
+	// 登录请求
+	LoginRequest {
+		Name     string `form:"name"`
+		Password string `form:"password"`
+	}
+	// 登录返回
+	LoginResponse {
+		Code  int64  `json:"code"`
+		Msg   string `json:"msg"`
+		Token string `json:"token,optional"`
+	}
+
+	// 用户数据
+	UserInfo {
+		Id    int64  `json:"id"`
+		Name  string `json:"name"`
+		Ctime int64  `json:"ctime"`
+		Utime int64  `json:"utime"`
+	}
+
+	UserInfoRequest {
+	}
+	UserInfoResponse {
+		Code int64    `json:"code"`
+		Msg  string   `json:"msg"`
+		Data UserInfo `json:"data,optional"`
+	}
+
+	// 创建用户
+	UserAddRequest {
+		Name     string `form:"name"`
+		Password string `form:"password"`
+	}
+	UserAddResponse {
+		Code int64  `json:"code"`
+		Msg  string `json:"msg"`
+	}
+)
+
+service Backend {
+	// 登录
+	@handler Login
+	post /api/login(LoginRequest) returns (LoginResponse)
+}
+
+@server(
+	jwt: Auth // 开启auth验证
+)
+
+service Backend {
+	// 用户信息
+	@handler UserInfo
+	post /api/user/info(UserInfoRequest) returns (UserInfoResponse)
+	
+	// 创建用户
+	@handler UserAdd
+	post /api/user/add(UserAddRequest) returns (UserAddResponse)
+	
+}
+
+```
+运行 make api
+
+修改 internal/logic/useraddlogic.go
+
+```go
+package logic
+
+import (
+	"context"
+	"time"
+
+	"tapi/bkmodel/dao/model"
+	"tapi/internal/svc"
+	"tapi/internal/types"
+
+	"github.com/zeromicro/go-zero/core/logx"
+)
+
+type UserAddLogic struct {
+	logx.Logger
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+}
+
+func NewUserAddLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserAddLogic {
+	return &UserAddLogic{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
+}
+
+func (l *UserAddLogic) UserAdd(req *types.UserAddRequest) (resp *types.UserAddResponse, err error) {
+
+	table := l.svcCtx.BkModel.User
+	// 查询用户是否存在
+	u, err := table.WithContext(l.ctx).Where(table.Name.Eq(req.Name)).First()
+	if err != nil {
+		return &types.UserAddResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}, nil
+	}
+	if u.Name == req.Name {
+		return &types.UserAddResponse{
+			Code: 500,
+			Msg:  "用户已存在",
+		}, nil
+	}
+
+	// 新建用户
+	currTime := time.Now().Unix()
+	user := model.User{
+		Name:     req.Name,
+		Password: req.Password,
+		Status:   1,
+		Utime:    int32(currTime),
+		Ctime:    int32(currTime),
+	}
+
+	err = table.WithContext(l.ctx).Create(&user)
+	if err != nil {
+		return &types.UserAddResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}, nil
+	}
+	return &types.UserAddResponse{
+		Code: 200,
+		Msg:  "成功",
+	}, nil
+}
+
+```
+
+运行 make dev
+
+测试
+
+上面代码测试返回为空数据，dlv调试发现
+
+if u.Name == req.Name 
+这句中u为nil
+
+修改成
+
+if u != nil && u.Name == req.Name
+
+重新运行 make dev 再测试OK
+![imange](../timg2/6.png)
+
+
