@@ -11,6 +11,7 @@
 [jwt用户登录](#jwt用户登录)<br />
 [错误处理](#错误处理)<br />
 [创建用户](#创建用户)<br />
+[异常处理](#异常处理)<br />
 
 ## 目的
 
@@ -896,4 +897,75 @@ if u != nil && u.Name == req.Name
 重新运行 make dev 再测试OK
 ![imange](../timg2/6.png)
 
+## 异常处理
 
+> 上面创建用户出现了异常，go-zero捕获了，改变了http的code，这种方式对于接口不是很合理，所以改造了rcover中间件
+
+修改backend.go
+```go
+package main
+
+import (
+	"context"
+	"flag"
+	"fmt"
+	"log"
+	"net/http"
+	"runtime/debug"
+
+	"tapi/internal/config"
+	"tapi/internal/handler"
+	"tapi/internal/svc"
+	"tapi/internal/types"
+
+	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/rest"
+	"github.com/zeromicro/go-zero/rest/httpx"
+)
+
+var configFile = flag.String("f", "etc/backend.yaml", "the config file")
+
+func main() {
+	flag.Parse()
+
+	var c config.Config
+	conf.MustLoad(*configFile, &c)
+
+	server := rest.MustNewServer(c.RestConf)
+	defer server.Stop()
+
+	ctx := svc.NewServiceContext(c)
+	handler.RegisterHandlers(server, ctx)
+
+	httpx.SetErrorHandlerCtx(func(ctx context.Context, err error) (int, interface{}) {
+		fmt.Println(err.Error())
+		return http.StatusOK, &types.CodeErrorResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}
+	})
+
+	// 全局recover中间件
+	server.Use(func(next http.HandlerFunc) http.HandlerFunc {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			defer func() {
+				if result := recover(); result != nil {
+					log.Println(fmt.Sprintf("%v\n%s", result, debug.Stack()))
+					httpx.OkJson(w, &types.CodeErrorResponse{
+						Code: 500,
+						Msg:  "服务器错误", //string(debug.Stack()),
+					})
+				}
+			}()
+
+			next.ServeHTTP(w, r)
+		})
+	})
+
+	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
+	server.Start()
+}
+
+```
+
+> 上面改造的方式参考了go-zero/rest/handler/recoverhandler.go，这种改造方式不确定是否正确，暂时先解决了遇到的问题，后续再研究go-zero源码

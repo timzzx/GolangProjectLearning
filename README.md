@@ -34,6 +34,7 @@
 + [jwt用户登录](doc/go-zero-antd2.md#jwt用户登录)<br />
 + [错误处理](doc/go-zero-antd2.md#错误处理)<br />
 + [创建用户](doc/go-zero-antd2.md#创建用户)<br />
++ [异常处理](doc/go-zero-antd2.md#异常处理)<br />
 
 ## go本地开发环境搭建
 
