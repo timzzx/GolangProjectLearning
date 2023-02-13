@@ -42,6 +42,7 @@
 + [数据库表设计](doc/go-zero-antd3.md#数据库表设计)<br />
 + [go-zero添加go-redis包](doc/go-zero-antd3.md#go-zero增加redis)<br />
 + [获取路由URl](doc/go-zero-antd3.md#获取路由url)<br />
++ [角色表新增，编辑，删除，列表](doc/go-zero-antd3.md#角色表新增编辑删除列表)
 
 ## go本地开发环境搭建
 

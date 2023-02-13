@@ -7,6 +7,7 @@
 [数据库表设计](#数据库表设计)<br />
 [go-zero添加go-redis包](#go-zero增加redis)<br />
 [获取路由URl](#获取路由url)<br />
+[角色表新增，编辑，删除，列表](#角色表新增编辑删除列表)
 
 ## 数据库表设计
 
@@ -376,3 +377,359 @@ func (l *RouterListLogic) RouterList(req *types.RouterListResquest) (resp *types
     ]
 }
 ```
+## 角色表新增编辑删除列表
+新增api/user.api
+```go
+type (
+	// 创建用户
+	UserAddRequest {
+		Name     string `form:"name"`
+		Password string `form:"password"`
+	}
+	UserAddResponse {
+		Code int64  `json:"code"`
+		Msg  string `json:"msg"`
+	}
+
+    // 角色列表
+    RoleListRequest {
+
+    }
+    Role {
+        Id int64 `json:"id"`
+        Nmae string `json:"name"`
+        Type int64 `json:"type"`
+        Ctime int64 `json:"ctime"`
+        Utime int64 `json:"utime"`
+    }
+    RoleListResponse {
+        Code int64    `json:"code"`
+		Msg  string   `json:"msg"`
+		Data []Role `json:"data,optional"`
+    }
+
+    // 角色编辑
+    RoleEditRequest {
+        Id int64 `form:"id"`
+        Name     string `form:"name"`
+        Type int64 `form:"type"`
+    }
+    RoleEditResponse {
+        Code int64  `json:"code"`
+		Msg  string `json:"msg"`
+    }
+
+    // 角色删除
+    RoleDeleteRequest {
+        Id int64 `form:"id"`
+    }
+    RoleDeleteResponse {
+        Code int64  `json:"code"`
+		Msg  string `json:"msg"`
+    }
+
+)
+```
+编辑project.api
+```go
+...
+import (
+	"./api/routers.api"
+	"./api/user.api"  //新增
+)
+
+...
+  // 获取路由列表
+	@handler RouterList
+	get /api/router/list(RouterListResquest) returns (RouterListResponse)
+	
+	// 角色列表 +
+	@handler RoleList
+	get /api/role/list(RoleListRequest) returns (RoleListResponse)
+	
+	// 角色编辑 +
+	@handler RoleEdit
+	post /api/role/edit(RoleEditRequest) returns (RoleEditResponse)
+	
+	// 角色删除 +
+	@handler RoleDelete
+	post /api/role/delete(RoleDeleteRequest) returns (RoleDeleteResponse)
+	
+
+```
+
+执行make api生成代码
+
+
+修改internal/rolelistlogic.go
+```go
+package logic
+
+import (
+	"context"
+
+	"tapi/internal/svc"
+	"tapi/internal/types"
+
+	"github.com/zeromicro/go-zero/core/logx"
+	"gorm.io/gorm"
+)
+
+type RoleListLogic struct {
+	logx.Logger
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+}
+
+func NewRoleListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RoleListLogic {
+	return &RoleListLogic{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
+}
+
+func (l *RoleListLogic) RoleList(req *types.RoleListRequest) (resp *types.RoleListResponse, err error) {
+	// 数据表
+	role := l.svcCtx.BkModel.Role
+	// 查询
+	list, err := role.WithContext(l.ctx).Where(role.Status.Eq(1)).Order(role.ID).Find()
+	if err != nil {
+		if err != gorm.ErrRecordNotFound {
+			return &types.RoleListResponse{
+				Code: 500,
+				Msg:  "查询失败",
+			}, nil
+		}
+	}
+
+	var data []types.Role
+
+	if list != nil {
+		for _, item := range list {
+			d := types.Role{
+				Id:    item.ID,
+				Nmae:  item.Name,
+				Type:  int64(item.Type),
+				Ctime: int64(item.Ctime),
+				Utime: int64(item.Utime),
+			}
+			data = append(data, d)
+		}
+	}
+
+	return &types.RoleListResponse{
+		Code: 200,
+		Msg:  "成功",
+		Data: data,
+	}, nil
+}
+
+```
+修改internal/roleeditlogic.go
+```go
+package logic
+
+import (
+	"context"
+	"time"
+
+	"tapi/bkmodel/dao/model"
+	"tapi/internal/svc"
+	"tapi/internal/types"
+
+	"github.com/zeromicro/go-zero/core/logx"
+)
+
+type RoleEditLogic struct {
+	logx.Logger
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+}
+
+func NewRoleEditLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RoleEditLogic {
+	return &RoleEditLogic{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
+}
+
+func (l *RoleEditLogic) RoleEdit(req *types.RoleEditRequest) (resp *types.RoleEditResponse, err error) {
+	// 数据表
+	role := l.svcCtx.BkModel.Role.WithContext(l.ctx)
+	if req.Id == 0 {
+		// 查询看是否存在
+		rs, _ := role.Where(l.svcCtx.BkModel.Role.Name.Eq(req.Name)).Where(l.svcCtx.BkModel.Role.Status.Eq(1)).First()
+		if rs != nil {
+			return &types.RoleEditResponse{
+				Code: 500,
+				Msg:  "角色已存在，请重新创建",
+			}, nil
+		}
+		// 新增
+		err = role.Create(&model.Role{
+			Name:  req.Name,
+			Type:  int32(req.Type),
+			Ctime: int32(time.Now().Unix()),
+			Utime: int32(time.Now().Unix()),
+		})
+		if err != nil {
+			return &types.RoleEditResponse{
+				Code: 500,
+				Msg:  err.Error(),
+			}, nil
+		}
+	} else {
+		// 更新
+		r, err := role.Where(l.svcCtx.BkModel.Role.ID.Eq(req.Id)).Updates(model.Role{
+			Name:  req.Name,
+			Utime: int32(time.Now().Unix()),
+		})
+		if err != nil {
+			return &types.RoleEditResponse{
+				Code: 500,
+				Msg:  err.Error(),
+			}, nil
+		}
+		if r.Error != nil {
+			return &types.RoleEditResponse{
+				Code: 500,
+				Msg:  r.Error.Error(),
+			}, nil
+		}
+	}
+
+	return &types.RoleEditResponse{
+		Code: 200,
+		Msg:  "成功",
+	}, nil
+}
+
+```
+修改internal/roledeletelogic.go
+```go
+package logic
+
+import (
+	"context"
+	"time"
+
+	"tapi/bkmodel/dao/model"
+	"tapi/internal/svc"
+	"tapi/internal/types"
+
+	"github.com/zeromicro/go-zero/core/logx"
+)
+
+type RoleDeleteLogic struct {
+	logx.Logger
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+}
+
+func NewRoleDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RoleDeleteLogic {
+	return &RoleDeleteLogic{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
+}
+
+func (l *RoleDeleteLogic) RoleDelete(req *types.RoleDeleteRequest) (resp *types.RoleDeleteResponse, err error) {
+	// 数据表
+	role := l.svcCtx.BkModel.Role
+	// 删除(标记删除)
+	r, err := role.WithContext(l.ctx).Where(role.ID.Eq(req.Id)).Updates(model.Role{
+		Status: 2,
+		Utime:  int32(time.Now().Unix()),
+	})
+	if err != nil {
+		return &types.RoleDeleteResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}, nil
+	}
+	if r.Error != nil {
+		return &types.RoleDeleteResponse{
+			Code: 500,
+			Msg:  r.Error.Error(),
+		}, nil
+	}
+
+	return &types.RoleDeleteResponse{
+		Code: 200,
+		Msg:  "成功",
+	}, nil
+}
+
+```
+
+完成后运行make dev
+
+### 测试
+#### 新增
+192.168.1.13:8888/api/role/edit?name=admin&type=2&id=0
+```json
+{
+    "id": 0,
+    "code": 200,
+    "msg": "成功"
+}
+// 失败
+{
+    "id": 0,
+    "code": 500,
+    "msg": "角色已存在，请重新创建"
+}
+
+```
+> 问题：暂时没有处理lastinsertId,gorm要用事务处理。
+#### 编辑
+192.168.1.13:8888/api/role/edit?name=admin1&type=2&id=1
+```json
+{
+    "id": 0,
+    "code": 200,
+    "msg": "成功"
+}
+```
+#### 列表
+192.168.1.13:8888/api/role/list
+```json
+{
+    "code": 200,
+    "msg": "成功",
+    "data": [
+        {
+            "id": 1,
+            "name": "admin1",
+            "type": 2,
+            "ctime": 1676290849,
+            "utime": 1676291007
+        }
+    ]
+}
+```
+#### 删除
+192.168.1.13:8888/api/role/delete?id=1
+```json
+{
+    "code": 200,
+    "msg": "成功"
+}
+```
+
+
+
+
+## 权限资源新增，删除，列表
+
+
+## 角色关联权限资源新增，删除
+
+
+## 用户新增，编辑，删除
+
+
+## 用户登录（修改）
