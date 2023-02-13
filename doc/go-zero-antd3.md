@@ -7,7 +7,8 @@
 [数据库表设计](#数据库表设计)<br />
 [go-zero添加go-redis包](#go-zero增加redis)<br />
 [获取路由URl](#获取路由url)<br />
-[角色表新增，编辑，删除，列表](#角色表新增编辑删除列表)
+[角色表新增，编辑，删除，列表](#角色表新增编辑删除列表)<br />
+[权限资源新增删除列表](#权限资源新增删除列表)<br />
 
 ## 数据库表设计
 
@@ -721,10 +722,203 @@ func (l *RoleDeleteLogic) RoleDelete(req *types.RoleDeleteRequest) (resp *types.
 ```
 
 
+## 权限资源新增删除列表
 
+> go-zero单体服务（权限管理-1）获取路由列表就是为了这个接口，提供可用的URL，其实也可以手动编写URL来传入这个接口。（手动不安全还是通过代码获取比较合理）
 
-## 权限资源新增，删除，列表
+新建 api/permission_resource.api
+```
+type(
+    PermissionResourceListRequest {
+    }
+    PermissionResource {
+        Name string `form:"name"`
+        Url string `form:"url"`
+        Ctime int64 `form:"ctime"`
+    }
+    PermissionResourceListResponse {
+        Code int64 `json:"code"`
+        Msg string `json:"msg"`
+        Data []PermissionResource `json:"data"`
+    }
+    PermissionResourceEditRequest {
+        Id int64 `form:"id"`
+        Name string `form:"name"`
+        Url string `form:"url"`
+    }
+    PermissionResourceEditResponse {
+        Code int64 `json:"code"`
+        Msg string `json:"msg"`
+    }
+    PermissionResourceDeleteRequest {
+        Id int64 `form:"id"`
+    }
+    PermissionResourceDeleteResponse {
+        Code int64 `json:"code"`
+        Msg string `json:"msg"`
+    }
+)
+```
 
+修改project.api
+
+```
+...
+import (
+	"./api/routers.api"
+	"./api/user.api"
+	"./api/permission_resource.api"
+)
+...
+// 权限资源列表
+@handler PermissionResourceList
+post /api/permission/resource/list(PermissionResourceListRequest) returns (PermissionResourceListResponse)
+
+// 权限资源列表
+@handler PermissionResourceEdit
+post /api/permission/resource/edit(PermissionResourceEditRequest) returns (PermissionResourceEditResponse)
+
+// 权限资源删除
+@handler PermissionResourceDelete
+post /api/permission/resource/delete(PermissionResourceDeleteRequest) returns (PermissionResourceDeleteResponse)
+	
+
+```
+
+运行 make api 生成代码
+
+修改 internal/logic/permissionresourcelistlogic.go
+
+``` go
+func (l *PermissionResourceListLogic) PermissionResourceList(req *types.PermissionResourceListRequest) (resp *types.PermissionResourceListResponse, err error) {
+	p := l.svcCtx.BkModel.PermissionResource
+	pr, err := p.WithContext(l.ctx).Where(p.Status.Eq(1)).Find()
+
+	if err != nil {
+		return &types.PermissionResourceListResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}, nil
+	}
+	var data []types.PermissionResource
+	if pr != nil {
+		for _, item := range pr {
+			d := types.PermissionResource{
+				Name:  item.Name,
+				Url:   item.URL,
+				Ctime: int64(item.Ctime),
+			}
+			data = append(data, d)
+		}
+	}
+
+	return &types.PermissionResourceListResponse{
+		Code: 200,
+		Msg:  "成功",
+		Data: data,
+	}, nil
+}
+```
+修改 internal/logic/permissionresourceeditlogic.go
+```go
+func (l *PermissionResourceEditLogic) PermissionResourceEdit(req *types.PermissionResourceEditRequest) (resp *types.PermissionResourceEditResponse, err error) {
+	p := l.svcCtx.BkModel.PermissionResource
+
+	// 只做新增，不做修改
+	// 查询数据是否存在
+	rp, _ := p.WithContext(l.ctx).Where(p.URL.Eq(req.Url)).Where(p.Status.Eq(1)).First()
+	if rp != nil {
+		return &types.PermissionResourceEditResponse{
+			Code: 500,
+			Msg:  "资源已存在",
+		}, nil
+	}
+
+	// 新建
+	err = p.WithContext(l.ctx).Create(&model.PermissionResource{
+		Name:  req.Name,
+		URL:   req.Url,
+		Ctime: int32(time.Now().Unix()),
+		Utime: int32(time.Now().Unix()),
+	})
+
+	if err != nil {
+		return &types.PermissionResourceEditResponse{
+			Code: 500,
+			Msg:  "新建失败",
+		}, nil
+	}
+
+	return &types.PermissionResourceEditResponse{
+		Code: 200,
+		Msg:  "成功",
+	}, nil
+}
+```
+
+修改 internal/logic/permissionresourcedeletelogic.go
+```go
+func (l *PermissionResourceDeleteLogic) PermissionResourceDelete(req *types.PermissionResourceDeleteRequest) (resp *types.PermissionResourceDeleteResponse, err error) {
+	p := l.svcCtx.BkModel.PermissionResource
+
+	// 标记删除
+	_, err = p.WithContext(l.ctx).Where(p.ID.Eq(req.Id)).Updates(&model.PermissionResource{
+		Status: 2,
+		Utime:  int32(time.Now().Unix()),
+	})
+
+	if err != nil {
+		return &types.PermissionResourceDeleteResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}, nil
+	}
+
+	return &types.PermissionResourceDeleteResponse{
+		Code: 200,
+		Msg:  "成功",
+	}, nil
+}
+
+```
+
+运行 make:dev
+
+### 创建
+192.168.1.13:8888/api/permission/resource/edit?name=用户信息&url=/api/user/info&id=0
+
+``` json
+{
+    "code": 200,
+    "msg": "成功"
+}
+```
+
+### 查询
+192.168.1.13:8888/api/permission/resource/list
+```json
+{
+    "code": 200,
+    "msg": "成功",
+    "data": [
+        {
+            "Name": "用户信息",
+            "Url": "/api/user/info",
+            "Ctime": 1676297045
+        }
+    ]
+}
+```
+
+### 删除
+192.168.1.13:8888/api/permission/resource/delete?id=1
+
+``` json
+{
+    "code": 200,
+    "msg": "成功"
+}
+```
 
 ## 角色关联权限资源新增，删除
 
