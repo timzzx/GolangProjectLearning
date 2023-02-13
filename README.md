@@ -39,6 +39,7 @@
 > 权限管理
 
 [go-zero单体服务（权限管理）](doc/go-zero-antd3.md#go-zero单体服务权限管理)<br />
++ [数据库表设计](doc/go-zero-antd3.md#数据库表设计)<br />
 
 ## go本地开发环境搭建
 
