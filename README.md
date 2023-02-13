@@ -40,8 +40,8 @@
 
 [go-zero单体服务（权限管理）](doc/go-zero-antd3.md#go-zero单体服务权限管理)<br />
 + [数据库表设计](doc/go-zero-antd3.md#数据库表设计)<br />
-+ [go-zero添加go-redis包](doc/go-zero-antd3.md#go-zero增加redis)
-+ [获取路由URl](doc/go-zero-antd3.md#获取路由url)
++ [go-zero添加go-redis包](doc/go-zero-antd3.md#go-zero增加redis)<br />
++ [获取路由URl](doc/go-zero-antd3.md#获取路由url)<br />
 
 ## go本地开发环境搭建
 
