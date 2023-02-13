@@ -36,6 +36,10 @@
 + [创建用户](doc/go-zero-antd2.md#创建用户)<br />
 + [异常处理](doc/go-zero-antd2.md#异常处理)<br />
 
+> 权限管理
+
+[go-zero单体服务（权限管理）](doc/go-zero-antd3.md#go-zero单体服务权限管理)<br />
+
 ## go本地开发环境搭建
 
 > 使用vbox + Ubuntu虚拟机 + docker + docker-compose + vscode远程容器内开发golang
