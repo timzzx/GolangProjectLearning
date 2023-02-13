@@ -60,4 +60,68 @@ CREATE TABLE `user` (
 ![image](../timg3/1.png)
 这个model显示高亮截图不好弄，只能这样
 
-##
+## 生成gen代码
+
+```
+make db
+```
+
+## go-zero增加redis
+
+> 使用go-redis
+
+修改 etc/backend.yaml
+```yaml
+...
+# 增加redis配置（测试环境没有密码就不加了）
+Redis:
+  Host: 192.168.1.13:6379
+  Type: node
+```
+
+修改 internal/config/config.go
+
+```go
+// 增加
+Redis struct {
+		Host string
+		Type string
+}
+```
+
+修改 internal/svc/servicecontext.go
+```go
+package svc
+
+import (
+	"tapi/bkmodel/dao/query"
+	"tapi/internal/config"
+
+	"github.com/redis/go-redis/v9"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+
+type ServiceContext struct {
+	Config config.Config
+
+	BkModel *query.Query
+
+	Redis *redis.Client
+}
+
+func NewServiceContext(c config.Config) *ServiceContext {
+	db, _ := gorm.Open(mysql.Open(c.Mysql.DataSource), &gorm.Config{})
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     c.Redis.Host,
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+	return &ServiceContext{
+		Config:  c,
+		BkModel: query.Use(db),
+		Redis:   rdb,
+	}
+}
+
+```
