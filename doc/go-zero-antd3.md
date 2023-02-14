@@ -12,6 +12,7 @@
 [角色关联权限资源新增删除](#角色关联权限资源新增删除)<br />
 [用户分配角色](#用户分配角色)<br />
 [增加go-zero权限验证中间件](#增加go-zero权限验证中间件)<br />
+[go-zero单体接口服务总结（源码已上传）](#go-zero单体接口服务总结)<br />
 
 ## 数据库表设计
 
@@ -1267,3 +1268,115 @@ func NewServiceContext(c config.Config) *ServiceContext {
 测试ok
 
 > 至此一个简单的权限管理go-zero单体服务api接口完成了。
+
+## go-zero单体接口服务总结
+
+[文档地址](https://github.com/timzzx/GolangProjectLearning)
+
+### 使用的go包
++ go-zero
++ go-redis(暂时这个没有使用只是添加到项目中)
++ gorm-gen （挺好用的推荐）
+
+### 遇到的一些问题
+
+> 解决方法请查看之前的文档
+
+1. makefile的使用，前期都还好突然有一次使用 make api 报错了。
+
+2. go-zero有一些方法在handler中无法访问，在中间件中无法使用srvCtx导致无法使用mysql，redis连接。
+
+### 源码
+
+[项目源码地址](https://github.com/timzzx/tapi)
+
+### sql
+```sql
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : 13
+ Source Server Type    : MySQL
+ Source Server Version : 50741
+ Source Host           : 192.168.1.13
+ Source Database       : bk
+
+ Target Server Type    : MySQL
+ Target Server Version : 50741
+ File Encoding         : utf-8
+
+ Date: 02/14/2023 17:56:48 PM
+*/
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+--  Table structure for `permission_resource`
+-- ----------------------------
+DROP TABLE IF EXISTS `permission_resource`;
+CREATE TABLE `permission_resource` (
+  `id` bigint(20) unsigned zerofill NOT NULL AUTO_INCREMENT COMMENT '权限资源表主键',
+  `name` varchar(64) NOT NULL DEFAULT '' COMMENT '资源名称',
+  `url` varchar(256) NOT NULL DEFAULT '' COMMENT '资源url',
+  `status` int(11) NOT NULL DEFAULT '1' COMMENT '1.有效，2.无效',
+  `ctime` int(11) NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `utime` int(11) NOT NULL DEFAULT '0' COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='权限资源表';
+
+-- ----------------------------
+--  Table structure for `role`
+-- ----------------------------
+DROP TABLE IF EXISTS `role`;
+CREATE TABLE `role` (
+  `id` bigint(20) unsigned zerofill NOT NULL AUTO_INCREMENT COMMENT '角色表',
+  `name` varchar(64) NOT NULL DEFAULT '' COMMENT '角色名',
+  `type` int(11) NOT NULL DEFAULT '1' COMMENT '1.普通用户，2.管理员',
+  `status` int(11) NOT NULL DEFAULT '1' COMMENT '1.有效，2.无效',
+  `ctime` int(11) NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `utime` int(11) NOT NULL DEFAULT '0' COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='角色表';
+
+-- ----------------------------
+--  Table structure for `role_permission_resource`
+-- ----------------------------
+DROP TABLE IF EXISTS `role_permission_resource`;
+CREATE TABLE `role_permission_resource` (
+  `id` bigint(20) unsigned zerofill NOT NULL AUTO_INCREMENT COMMENT '角色和权限资源关联表主键',
+  `role_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '角色id',
+  `prid` bigint(20) NOT NULL DEFAULT '0' COMMENT '权限资源id',
+  `status` int(11) NOT NULL DEFAULT '1' COMMENT '1.有效，2.无效',
+  `ctime` int(11) NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `utime` int(11) NOT NULL DEFAULT '0' COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COMMENT='角色和权限资源关联表';
+
+-- ----------------------------
+--  Table structure for `user`
+-- ----------------------------
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user` (
+  `id` bigint(20) unsigned zerofill NOT NULL AUTO_INCREMENT COMMENT '用户表主键',
+  `name` varchar(128) NOT NULL COMMENT '用户名',
+  `role_id` bigint(20) NOT NULL DEFAULT '0' COMMENT '角色id',
+  `password` varchar(64) NOT NULL COMMENT '密码',
+  `status` int(11) NOT NULL DEFAULT '1' COMMENT '是否有效1.有效 2.无效',
+  `ctime` int(11) NOT NULL DEFAULT '0' COMMENT '创建时间',
+  `utime` int(11) NOT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COMMENT='用户表';
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+```
+
+> postman 请求文档太长了，放到源码的doc文件夹下了
+
+### 最后
+
+> 这个版本只完成了基于go-zero，mysql的一个权限管理的接口，有很多问题没有解决，比如密码的加盐加密处理，redis用户缓存等。后续写前端的时候一步一步解决对应的问题。
+
+
+

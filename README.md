@@ -48,6 +48,8 @@
 + [用户分配角色](doc/go-zero-antd3.md#用户分配角色)<br />
 + [增加go-zero权限验证中间件](doc/go-zero-antd3.md#增加go-zero权限验证中间件)<br />
 
++ [go-zero单体接口服务总结（源码已上传）](doc/go-zero-antd3.md#go-zero单体接口服务总结)<br />
+
 ## go本地开发环境搭建
 
 > 使用vbox + Ubuntu虚拟机 + docker + docker-compose + vscode远程容器内开发golang
