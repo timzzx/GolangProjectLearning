@@ -10,6 +10,7 @@
 [角色表新增，编辑，删除，列表](#角色表新增编辑删除列表)<br />
 [权限资源新增删除列表](#权限资源新增删除列表)<br />
 [角色关联权限资源新增删除](#角色关联权限资源新增删除)<br />
+[用户分配角色](#用户分配角色)<br />
 
 ## 数据库表设计
 
@@ -1060,5 +1061,61 @@ func (l *RolePermissionResourceListLogic) RolePermissionResourceList(req *types.
 {
     "code": 200,
     "msg": "成功"
+}
+```
+
+## 用户分配角色
+
+修改project.api
+```go
+...
+UserSetRoleRequest {
+		UserId int64 `form:"user_id"`
+		RoleId int64 `form:"role_id"`
+	}
+UserSetRoleResponse {
+	Code int64  `json:"code"`
+	Msg  string `json:"msg"`
+}
+
+...
+
+// 用户设置角色
+@handler UserSetRole
+post /api/user/set/role(UserSetRoleRequest) returns(UserSetRoleResponse)
+```
+
+运行 make api
+
+修改internal/logic/usersetrolelogic.go
+```go
+func (l *UserSetRoleLogic) UserSetRole(req *types.UserSetRoleRequest) (resp *types.UserSetRoleResponse, err error) {
+	u := l.svcCtx.BkModel.User
+	_, err = u.WithContext(l.ctx).Where(u.ID.Eq(req.UserId)).Updates(model.User{
+		RoleID: req.RoleId,
+		Utime:  int32(time.Now().Unix()),
+	})
+
+	if err != nil {
+		return &types.UserSetRoleResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}, nil
+	}
+
+	return &types.UserSetRoleResponse{
+		Code: 200,
+		Msg:  "设置成功",
+	}, nil
+}
+```
+运行 make dev
+
+测试
+192.168.1.13:8888/api/user/set/role?user_id=3&role_id=2
+```go
+{
+    "code": 200,
+    "msg": "设置成功"
 }
 ```
