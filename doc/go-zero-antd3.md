@@ -11,6 +11,7 @@
 [权限资源新增删除列表](#权限资源新增删除列表)<br />
 [角色关联权限资源新增删除](#角色关联权限资源新增删除)<br />
 [用户分配角色](#用户分配角色)<br />
+[增加go-zero权限验证中间件](#增加go-zero权限验证中间件)<br />
 
 ## 数据库表设计
 
@@ -1119,3 +1120,150 @@ func (l *UserSetRoleLogic) UserSetRole(req *types.UserSetRoleRequest) (resp *typ
     "msg": "设置成功"
 }
 ```
+
+## 增加go-zero权限验证中间件
+
+编辑project.api
+```go
+@server(
+	jwt: Auth // 开启auth验证
+	middleware: LoginMiddle // 增加这一句
+)
+```
+
+运行 make api 会自动生成对应的中间件代码
+
+具体的增加中间件可以查看go-zero文档
+
+> 在编写中间件的是否发现没法使用到srvCtx，这样没法使用mysql连接，查看源码思考后暂时先在backend.go中增加全局变量导出db
+
+编辑common/varx/vars.go
+```go
+package varx
+
+import (
+	"tapi/bkmodel/dao/query"
+
+	"github.com/zeromicro/go-zero/rest"
+)
+
+var RouterList []rest.Route
+
+var Ctx *query.Query
+
+```
+编辑backend.go
+```go
+package main
+
+import (
+	"context"
+	"flag"
+	"fmt"
+	"log"
+	"net/http"
+	"runtime/debug"
+
+	"tapi/common/varx"
+	"tapi/internal/config"
+	"tapi/internal/handler"
+	"tapi/internal/svc"
+	"tapi/internal/types"
+
+	"github.com/zeromicro/go-zero/core/conf"
+	"github.com/zeromicro/go-zero/rest"
+	"github.com/zeromicro/go-zero/rest/httpx"
+)
+
+var configFile = flag.String("f", "etc/backend.yaml", "the config file")
+
+func main() {
+	flag.Parse()
+
+	var c config.Config
+	conf.MustLoad(*configFile, &c)
+
+	server := rest.MustNewServer(c.RestConf)
+	defer server.Stop()
+
+	ctx := svc.NewServiceContext(c)
+	handler.RegisterHandlers(server, ctx)
+
+	httpx.SetErrorHandlerCtx(func(ctx context.Context, err error) (int, interface{}) {
+		fmt.Println(err.Error())
+		return http.StatusOK, &types.CodeErrorResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}
+	})
+
+	// 全局recover中间件
+	server.Use(func(next http.HandlerFunc) http.HandlerFunc {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			defer func() {
+				if result := recover(); result != nil {
+					log.Println(fmt.Sprintf("%v\n%s", result, debug.Stack()))
+					httpx.OkJson(w, &types.CodeErrorResponse{
+						Code: 500,
+						Msg:  "服务器错误", //string(debug.Stack()),
+					})
+				}
+			}()
+
+			next.ServeHTTP(w, r)
+		})
+	})
+	// 路由列表
+	varx.RouterList = server.Routes()
+	varx.Ctx = ctx.BkModel
+
+	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
+	server.Start()
+}
+
+```
+
+修改/internal/middleware/loginmiddlemiddleware.go
+```
+package svc
+
+import (
+	"tapi/bkmodel/dao/query"
+	"tapi/internal/config"
+	"tapi/internal/middleware"
+
+	"github.com/redis/go-redis/v9"
+	"github.com/zeromicro/go-zero/rest"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+)
+
+type ServiceContext struct {
+	Config config.Config
+
+	LoginMiddle rest.Middleware
+
+	BkModel *query.Query
+
+	Redis *redis.Client
+}
+
+func NewServiceContext(c config.Config) *ServiceContext {
+	db, _ := gorm.Open(mysql.Open(c.Mysql.DataSource), &gorm.Config{})
+	rdb := redis.NewClient(&redis.Options{
+		Addr:     c.Redis.Host,
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+	return &ServiceContext{
+		Config:      c,
+		LoginMiddle: middleware.NewLoginMiddleMiddleware().Handle,
+		BkModel:     query.Use(db),
+		Redis:       rdb,
+	}
+}
+
+```
+测试ok
+
+> 至此一个简单的权限管理go-zero单体服务api接口完成了。
