@@ -9,6 +9,7 @@
 [获取路由URl](#获取路由url)<br />
 [角色表新增，编辑，删除，列表](#角色表新增编辑删除列表)<br />
 [权限资源新增删除列表](#权限资源新增删除列表)<br />
+[角色关联权限资源新增删除](#角色关联权限资源新增删除)<br />
 
 ## 数据库表设计
 
@@ -920,10 +921,144 @@ func (l *PermissionResourceDeleteLogic) PermissionResourceDelete(req *types.Perm
 }
 ```
 
-## 角色关联权限资源新增，删除
+## 角色关联权限资源新增删除
+新增api/role_permission_resource.api
+```go
+type (
+    RolePermissionResourceListRequest {
+        RoleId int64 `form:"role_id"`
+    }
+    RolePermissionResource {
+        Id int64 `json:"id"`
+        Name string `json:"name"`
+        URL string `json:"url"`
+        Ctime int64 `json:"ctime"`
+    }
+    RolePermissionResourceListResponse {
+        Code int64 `json:"code"`
+        Msg string `json:"msg"`
+        Data []RolePermissionResource `json:"data"`
+    }
+    RolePermissionResourceEditRequest {
+        RoleId int64 `form:"role_id"`
+        Data string `form:"data"`
+    }
+    RolePermissionResourceEditResponse {
+        Code int64 `json:"code"`
+        Msg string `json:"msg"`
+    }    
+)
+```
+修改 project.api
+```go
+...
+import (
+	"./api/routers.api"
+	"./api/user.api"
+	"./api/permission_resource.api"
+	"./api/role_permission_resource.api" // 新增
+)
+...
+// 角色资源列表
+@handler RolePermissionResourceList
+post /api/role/permission/resource/list(RolePermissionResourceListRequest) returns (RolePermissionResourceListResponse)
 
+// 角色分配资源
+@handler RolePermissionResourceEdit
+post /api/role/permission/resource/edit(RolePermissionResourceEditRequest) returns (RolePermissionResourceEditResponse)
+...
 
-## 用户新增，编辑，删除
+```
 
+运行 make api 生成代码
 
-## 用户登录（修改）
+修改internal/logic/rolepermissionresourceeditlogic.go
+```go
+func (l *RolePermissionResourceEditLogic) RolePermissionResourceEdit(req *types.RolePermissionResourceEditRequest) (resp *types.RolePermissionResourceEditResponse, err error) {
+	r := l.svcCtx.BkModel.RolePermissionResource
+	// 先删除
+	_, err = r.WithContext(l.ctx).Where(r.RoleID.Eq(req.RoleId)).Delete()
+	if err != nil {
+		return &types.RolePermissionResourceEditResponse{
+			Code: 500,
+			Msg:  err.Error(),
+		}, nil
+	}
+
+	var data []*model.RolePermissionResource
+
+	ids := strings.Split(req.Data, ",")
+
+	for _, item := range ids {
+		i, _ := strconv.Atoi(item)
+		p := &model.RolePermissionResource{
+			RoleID: req.RoleId,
+			Prid:   int64(i),
+			Ctime:  int32(time.Now().Unix()),
+			Utime:  int32(time.Now().Unix()),
+		}
+		data = append(data, p)
+	}
+
+	// 分配权限
+	if data != nil {
+		r.WithContext(l.ctx).Create(data...)
+	}
+	return &types.RolePermissionResourceEditResponse{
+		Code: 200,
+		Msg:  "成功",
+	}, nil
+}
+```
+
+修改internal/logic/rolepermissionresourcelistlogic.go
+```go
+func (l *RolePermissionResourceListLogic) RolePermissionResourceList(req *types.RolePermissionResourceListRequest) (resp *types.RolePermissionResourceListResponse, err error) {
+	// join查询
+	r := l.svcCtx.BkModel.RolePermissionResource
+	p := l.svcCtx.BkModel.PermissionResource
+
+	var data []types.RolePermissionResource
+
+	err = r.WithContext(l.ctx).Select(p.ID.As("Id"), r.Ctime, p.Name, p.URL).LeftJoin(p, r.Prid.EqCol(p.ID)).Scan(&data)
+
+	if err != nil {
+		return &types.RolePermissionResourceListResponse{
+			Code: 200,
+			Msg:  err.Error(),
+		}, nil
+	}
+
+	return &types.RolePermissionResourceListResponse{
+		Code: 200,
+		Msg:  "成功",
+		Data: data,
+	}, nil
+}
+
+```
+
+列表
+192.168.1.13:8888/api/role/permission/resource/list?role_id=2
+```json
+{
+    "code": 200,
+    "msg": "成功",
+    "data": [
+        {
+            "id": 2,
+            "name": "用户信息",
+            "url": "/api/user/info",
+            "ctime": 1676356348
+        }
+    ]
+}
+```
+编辑
+192.168.1.13:8888/api/role/permission/resource/edit?role_id=2&data=2
+```json
+{
+    "code": 200,
+    "msg": "成功"
+}
+```
