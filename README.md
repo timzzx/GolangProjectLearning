@@ -45,7 +45,7 @@
 + [角色表新增，编辑，删除，列表](doc/go-zero-antd3.md#角色表新增编辑删除列表)<br />
 + [权限资源新增删除列表](doc/go-zero-antd3.md#权限资源新增删除列表)<br />
 + [角色关联权限资源新增删除](doc/go-zero-antd3.md#角色关联权限资源新增删除)<br />
-+[用户分配角色](doc/go-zero-antd3.md#用户分配角色)<br />
++ [用户分配角色](doc/go-zero-antd3.md#用户分配角色)<br />
 
 ## go本地开发环境搭建
 
