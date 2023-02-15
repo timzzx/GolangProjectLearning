@@ -59,6 +59,13 @@
 + [运行项目](doc/go-zero-antd4.md#运行项目)
 + [antd-pro项目源码](doc/go-zero-antd4.md#antd-pro项目源码)
 
+> go-zero-antd实战
+
+[go-zero-antd实战](doc/go-zero-antd5.md)
+
++ [前言](doc/go-zero-antd5.md#前言)
++ [项目下载启动](doc/go-zero-antd5.md#项目下载启动)
+
 ## go本地开发环境搭建
 
 > 使用vbox + Ubuntu虚拟机 + docker + docker-compose + vscode远程容器内开发golang
