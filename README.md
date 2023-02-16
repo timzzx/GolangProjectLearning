@@ -1,6 +1,7 @@
 # GolangProjectLearning
 
-> 个人使用go开发学习的记录，国内可以查看[掘金](https://juejin.cn/column/7199193212777676860)
+> 个人使用go开发学习的记录，国内可以查看[掘金](https://juejin.cn/column/7199193212777676860)或者[learnku](https://learnku.com/blog/timzzx)
+
 
 ## 目录
 
