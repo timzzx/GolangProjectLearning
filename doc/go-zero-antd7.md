@@ -84,3 +84,119 @@ go run main.go userlist
 ## 源码已上传
 
 [地址](https://github.com/timzzx/go-zero-antd-backend)
+
+# go-zero-antd实战-4（go-zero添加cron定时任务）
+
+> 后台系统一般都会有定时任务的需求，所以加入[cron](https://github.com/robfig/cron)
+
+创建了一个目录cron如下
+```
+├── cmd
+│   ├── root.go
+│   ├── schedule.go
+│   └── userlist.go
+├── cronx
+│   └── time.go
+└── main.go 
+
+2 directories, 5 files
+```
+root.go中启动了cron，加入了go-zero srvCtx
+```go
+package cmd
+
+import (
+	"fmt"
+	"tapi/internal/config"
+	"tapi/internal/svc"
+
+	"github.com/robfig/cron/v3"
+	"github.com/zeromicro/go-zero/core/conf"
+)
+
+var svcCtx *svc.ServiceContext
+
+func Execute() {
+	c := cron.New(cron.WithSeconds())
+
+	// 这里是加入定时任务
+	ScheduleRun(c)
+
+	fmt.Println("定时任务启动...")
+	go c.Start()
+	defer c.Stop()
+	select {}
+}
+
+func init() {
+	var c config.Config
+	conf.MustLoad("../etc/backend.yaml", &c)
+	svcCtx = svc.NewServiceContext(c)
+}
+
+
+```
+
+schedule.go只要在其中加入任务即可
+```go
+func ScheduleRun(c *cron.Cron) {
+	c.AddFunc(cronx.EveryMinute(), func() {
+		fmt.Println("定时任务")
+	})
+	// 每分钟定时查询用户信息
+	c.AddFunc(cronx.Every5s(), userlist)
+
+	// 计划任务执行写在这里
+}
+
+```
+
+## 测试cron
+写了一个userlist.go
+```go
+package cmd
+
+import (
+	"context"
+	"fmt"
+)
+
+func userlist() {
+	u := svcCtx.BkModel.User
+	d, err := u.WithContext(context.Background()).Debug().First()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(d)
+}
+
+```
+
+
+```
+root@tdev:/home/code/go-zero-antd-backend/api/cron# go run main.go 
+定时任务启动...
+
+2023/02/16 23:13:40 /home/code/go-zero-antd-backend/api/bkmodel/dao/query/user.gen.go:238
+[7.589ms] [rows:1] SELECT * FROM `user` ORDER BY `user`.`id` LIMIT 1
+&{1 tim 0 123456 1 0 0}
+
+2023/02/16 23:13:45 /home/code/go-zero-antd-backend/api/bkmodel/dao/query/user.gen.go:238
+[0.617ms] [rows:1] SELECT * FROM `user` ORDER BY `user`.`id` LIMIT 1
+&{1 tim 0 123456 1 0 0}
+```
+
+> cron定时任务加入go-zero项目完成
+
+
+## 源码已上传
+
+[地址](https://github.com/timzzx/go-zero-antd-backend)
+
+
+
+
+
+# go-zero-antd实战-5（go-zero添加asynq队列任务）
+
+> 后台系统一般都会有任务队列的需求，所以加入[asynq](https://github.com/hibiken/asynq)
