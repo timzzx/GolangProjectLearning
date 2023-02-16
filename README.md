@@ -67,6 +67,7 @@
 + [前言](doc/go-zero-antd5.md#前言)
 + [项目下载启动](doc/go-zero-antd5.md#项目下载启动)
 + [go-zero学习方法](doc/go-zero-antd6.md)
++ [go-zero添加cobra命令行工具](doc/go-zero-antd7.md)
 
 ## go本地开发环境搭建
 
