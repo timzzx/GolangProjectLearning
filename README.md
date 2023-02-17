@@ -69,6 +69,7 @@
 + [go-zero学习方法](doc/go-zero-antd6.md)
 + [go-zero添加cobra命令行工具](doc/go-zero-antd7.md#go-zero-antd实战-4go-zero添加cron定时任务)
 + [go-zero添加asynq队列任务](doc/go-zero-antd7.md#go-zero-antd实战-5go-zero添加asynq队列任务)
++ [antd关闭国际化，用户密码加密存储，增加用户退出接口](doc/go-zero-antd8.md#go-zero-antd实战-6antd关闭国际化用户密码加密存储增加用户退出接口)
 
 ## go本地开发环境搭建
 
