@@ -72,6 +72,7 @@
 + [go-zero添加asynq队列任务](doc/go-zero-antd7.md#go-zero-antd实战-5go-zero添加asynq队列任务)
 + [antd关闭国际化，用户密码加密存储，增加用户退出接口](doc/go-zero-antd8.md#go-zero-antd实战-6antd关闭国际化用户密码加密存储增加用户退出接口)
 + [antd与go-zero放在一个目录下eslint问题，修改用户密码，前后端完整过程整理](doc/go-zero-ant9.md)
++ [golang断言遇到的问题](doc/go-zero-antd10.md)
 
 ## go本地开发环境搭建
 
