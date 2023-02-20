@@ -1,6 +1,3 @@
-reactjs - 类型 '{}' 缺少类型中的以下属性 - TS 错误
-这个要加入?,让属性可选
-
 # go-zero-antd实战-9（用户管理antd）
 
 > go-zero接口文档写过了，这次就只写antd部分
@@ -328,6 +325,9 @@ export default UserList;
 <Button key="2" type="primary" danger onClick={() => { handleDel(record.id) }}>删除</Button>
 ```
 这里的onclick直接调用handleDel方法，会导致页面刷新的时候自动执行每条的这个方法，所以这里要用()=>{}包裹一下，具体原因暂时未去查询。
+
+reactjs - 类型 '{}' 缺少类型中的以下属性 - TS 错误
+这个要加入?,让属性可选
 
 展示
 ![image](../go_zero_antd_img/1.png)
