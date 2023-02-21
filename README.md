@@ -75,6 +75,7 @@
 + [golang断言遇到的问题](doc/go-zero-antd10.md)
 + [用户管理antd](doc/go-zero-antd11.md)
 + [资源发布antd，protable编辑单行提交，没有使用editTable](doc/go-zero-antd12.md)
++ [antd用户角色分配权限，antd tree控件，hooks使用【前后端权限管理完结】](doc/go-zero-antd13.md)
 
 ## go本地开发环境搭建
 
