@@ -74,6 +74,7 @@
 + [antd与go-zero放在一个目录下eslint问题，修改用户密码，前后端完整过程整理](doc/go-zero-ant9.md)
 + [golang断言遇到的问题](doc/go-zero-antd10.md)
 + [用户管理antd](doc/go-zero-antd11.md)
++ [资源发布antd，protable编辑单行提交，没有使用editTable](doc/go-zero-antd12.md)
 
 ## go本地开发环境搭建
 
