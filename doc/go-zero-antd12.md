@@ -134,3 +134,5 @@ const Index: React.FC = () => {
 export default Index;
 ```
 
+## 页面展示
+![image](../go_zero_antd_img/3.png)
