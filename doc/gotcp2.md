@@ -1,5 +1,9 @@
 # golang tcp服务-2(连接管理，解包封包，心跳)
 
+## 源码
+
+[地址](https://github.com/timzzx/tnet/tree/tnet-v0.2)
+
 修改Server.go
 ```go
 package tnet
