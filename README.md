@@ -83,6 +83,7 @@
 + [golang tcp服务-2(连接管理，解包封包，心跳)](doc/gotcp2.md)
 + [golang tcp服务-3(github发布自己的包和chat项目初始化)](doc/gotcp3.md)
 + [golang tcp服务-4(项目设计参考go-zero，tcp基于tnet)](doc/gotcp4.md)
++ [golang tcp服务-5(tcp长连接基于cobra完成singleTest tcp命令行客户端)](doc/gotcp5.md)
 
 ## go本地开发环境搭建
 
