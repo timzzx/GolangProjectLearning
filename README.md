@@ -85,6 +85,7 @@
 + [golang tcp服务-4(项目设计参考go-zero，tcp基于tnet)](doc/gotcp4.md)
 + [golang tcp服务-5(tcp长连接基于cobra完成singleTest tcp命令行客户端)](doc/gotcp5.md)
 + [golang tcp服务-6 (解决路由不存在报错的问题，修改消息接收方式)](doc/gotcp6.md)
++ [golang tcp服务-7 (修复tnet阻塞问题chat创建房间加入房间功能)](doc/gotcp7.md)
 
 ## go本地开发环境搭建
 
