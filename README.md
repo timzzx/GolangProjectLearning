@@ -87,6 +87,19 @@
 + [golang tcp服务-6 (解决路由不存在报错的问题，修改消息接收方式)](doc/gotcp6.md)
 + [golang tcp服务-7 (修复tnet阻塞问题chat创建房间加入房间功能)](doc/gotcp7.md)
 
+> 深入剖析k8s
++ [课前必读](k8s/1.md)
++ [容器基础](k8s/2.md)
++ [容器编排与Kubernetes作业管理](k8s/3.md)
++ [容器持久化存储](k8s/4.md)
++ [容器网络](k8s/5.md)
++ [k8s网络](k8s/6.md)
++ [k8s作业调度和资源管理](k8s/7.md)
+
+> 容器实战
++ [认识容器](container/1.md)
+
+
 ## go本地开发环境搭建
 
 > 使用vbox + Ubuntu虚拟机 + docker + docker-compose + vscode远程容器内开发golang
