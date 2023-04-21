@@ -104,8 +104,17 @@
 + [容器安全](container/5.md)
 
 > 云原生架构与GitOps实战
-+ [从零上手gitops](gitops/1.md)
-
++ [从零上手gitops(multipass使用，部署项目到集群)](gitops/1.md)
++ [k8s实现自动扩容和自愈](gitops/2.md)
++ [借助GitOps实现应用秒级自动发布和回滚](gitops/3.md)
++ [k8s实战-示例应用](gitops/4.md)
++ [使用命名空间隔离团队及应用环境](gitops/5.md#使用命名空间隔离团队及应用环境)
++ [业务选择最适合的工作负载类型](gitops/5.md#业务选择最适合的工作负载类型)
++ [K8s服务发现](gitops/6.md)
++ [K8s应用配置](gitops/7.md)
++ [K8s集群业务服务暴露外网访问](gitops/8.md)
++ [K8s自动弹性扩容](gitops/9.md)
++ [K8s健康状态](gitops/10.md)
 
 ## go本地开发环境搭建
 
