@@ -116,6 +116,11 @@
 + [K8s自动弹性扩容](gitops/9.md)
 + [K8s健康状态](gitops/10.md)
 
+> go-zero-rpc-antd-K8s-GitOps实战
++ [开篇说明](go-zero-rpc-antd-K8s-GitOps/1.md)
++ [开发环境-multipass](go-zero-rpc-antd-K8s-GitOps/2.md)
++ [开发环境-go-nodejs-docker-K8s](go-zero-rpc-antd-K8s-GitOps/3.md)
+
 ## go本地开发环境搭建
 
 > 使用vbox + Ubuntu虚拟机 + docker + docker-compose + vscode远程容器内开发golang
