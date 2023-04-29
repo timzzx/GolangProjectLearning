@@ -116,10 +116,24 @@
 + [K8s自动弹性扩容](gitops/9.md)
 + [K8s健康状态](gitops/10.md)
 
+> k8s 150个练习
++ [k8s 150练习（上）](k8sex/1.md)
++ [k8s 150练习（中）](k8sex/2.md)
++ [k8s 150练习（下）](k8sex/3.md)
+
+
+> K8s官方文档学习
++ [概念-组件](k8sd/1.md)
++ [概念-对象](k8sd/2.md)
++ [概念-架构](k8sd/3.md)
++ [Pod](k8sd/4.md)
+
 > go-zero-rpc-antd-K8s-GitOps实战
 + [开篇说明](go-zero-rpc-antd-K8s-GitOps/1.md)
 + [开发环境-multipass](go-zero-rpc-antd-K8s-GitOps/2.md)
 + [开发环境-go-nodejs-docker-K8s](go-zero-rpc-antd-K8s-GitOps/3.md)
++ [开发环境-go-zero-antd](go-zero-rpc-antd-K8s-GitOps/4.md)
+
 
 ## go本地开发环境搭建
 
