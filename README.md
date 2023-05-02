@@ -87,6 +87,31 @@
 + [golang tcp服务-6 (解决路由不存在报错的问题，修改消息接收方式)](doc/gotcp6.md)
 + [golang tcp服务-7 (修复tnet阻塞问题chat创建房间加入房间功能)](doc/gotcp7.md)
 
+> K8s官方文档学习
+> 概念
++ [组件](k8sd/1.md)
++ [对象](k8sd/2.md)
++ [架构](k8sd/3.md)
+> 工作负载(了解k8s之后发现这块很重要)
++ [Pod](l8sd/4.md)
++ [Deployment](k8sd/5.md)
++ [ReplicaSet](k8sd/6.md)
++ [StatefulSet](k8sd/7.md)
++ [DaemonSet](k8sd/8.md)
++ [Job/CronJob]
++ [服务](k8sd/9.md)
++ [Ingress](k8sd/10.md)
+
+> k8s 150个练习
++ [k8s 150练习（上）](k8sex/1.md)
++ [k8s 150练习（中）](k8sex/2.md)
++ [k8s 150练习（下）](k8sex/3.md)
+
+> K8s学习整理
++ [容器命令和dockerfile和yaml编写规则](k8ss/1.md)
++ [Ingress和Ingress Controller和Ingress Class理解](k8ss/2.md)
++ [kubectl备忘录](k8ss/3.md)
+
 > 深入剖析k8s
 + [课前必读](k8s/1.md)
 + [容器基础](k8s/2.md)
@@ -116,17 +141,6 @@
 + [K8s自动弹性扩容](gitops/9.md)
 + [K8s健康状态](gitops/10.md)
 
-> k8s 150个练习
-+ [k8s 150练习（上）](k8sex/1.md)
-+ [k8s 150练习（中）](k8sex/2.md)
-+ [k8s 150练习（下）](k8sex/3.md)
-
-
-> K8s官方文档学习
-+ [概念-组件](k8sd/1.md)
-+ [概念-对象](k8sd/2.md)
-+ [概念-架构](k8sd/3.md)
-+ [Pod](k8sd/4.md)
 
 > go-zero-rpc-antd-K8s-GitOps实战
 + [开篇说明](go-zero-rpc-antd-K8s-GitOps/1.md)
