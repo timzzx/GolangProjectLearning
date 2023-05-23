@@ -110,7 +110,10 @@
 > K8s学习整理
 + [容器命令和dockerfile和yaml编写规则](k8ss/1.md)
 + [Ingress和Ingress Controller和Ingress Class理解](k8ss/2.md)
-+ [kubectl备忘录](k8ss/3.md)
++ [kubectl备忘录+部署备忘录](k8ss/3.md)
++ [k8s各类资源操作详解](k8ss/4.md)
++ [harbor、gitlab和ArgoCD安装](k8ss/5.md)
++ [Harbor配合ArgoCD使用](k8ss/6.md)
 
 > 深入剖析k8s
 + [课前必读](k8s/1.md)
