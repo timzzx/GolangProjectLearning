@@ -107,14 +107,6 @@
 + [k8s 150练习（中）](k8sex/2.md)
 + [k8s 150练习（下）](k8sex/3.md)
 
-> K8s学习整理
-+ [容器命令和dockerfile和yaml编写规则](k8ss/1.md)
-+ [Ingress和Ingress Controller和Ingress Class理解](k8ss/2.md)
-+ [kubectl备忘录+部署备忘录](k8ss/3.md)
-+ [k8s各类资源操作详解](k8ss/4.md)
-+ [harbor、gitlab和ArgoCD安装](k8ss/5.md)
-+ [Harbor配合ArgoCD使用](k8ss/6.md)
-
 > 深入剖析k8s
 + [课前必读](k8s/1.md)
 + [容器基础](k8s/2.md)
@@ -144,6 +136,13 @@
 + [K8s自动弹性扩容](gitops/9.md)
 + [K8s健康状态](gitops/10.md)
 
+> K8s学习整理
++ [容器命令和dockerfile和yaml编写规则](k8ss/1.md)
++ [Ingress和Ingress Controller和Ingress Class理解](k8ss/2.md)
++ [kubectl备忘录+部署备忘录](k8ss/3.md)
++ [k8s各类资源操作详解](k8ss/4.md)
++ [harbor、gitlab和ArgoCD安装](k8ss/5.md)
++ [Harbor配合ArgoCD使用](k8ss/6.md)
 
 > go-zero-rpc-antd-K8s-GitOps实战
 + [开篇说明](go-zero-rpc-antd-K8s-GitOps/1.md)
